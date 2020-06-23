@@ -233,7 +233,8 @@ media_config = {
             'title': 'div.media-block > a::attr(title)',
             'text': 'div.body-container',
             'link': 'div.media-block > a::attr(href)',
-            'date': 'div.media-block span.date ::text'
+            'date': 'div.media-block span.date ::text',
+            'next_page_number': 'only_page_number'
         }
     },
     '112': {
@@ -264,7 +265,8 @@ media_config = {
             'link': 'a::attr(href)',
             'text': 'div.article_body div.article_body',
             'time': 'span.news_date::text',
-            'next_page': 'div.navigate > span.next>a::attr(href)'
+            'next_page': 'div.navigate > span.next>a::attr(href)',
+            'next_page_number': 'page_and_date'
         }
     },
     'strana': {
@@ -279,7 +281,8 @@ media_config = {
             'link': 'div > div.title > a::attr(href)',
             'date': 'div > time.date > span::text',
             'time': 'div > time.date::text',
-            'next_page': 'div.pagination > ul.pagination-list > li.next.next_page > a[rel="next"]::attr(href)'
+            'next_page': 'div.pagination > ul.pagination-list > li.next.next_page > a[rel="next"]::attr(href)',
+            'next_page_number': 'page_and_date'
         }
     },
     'znaj': {
@@ -324,7 +327,8 @@ media_config = {
             'link': 'a::attr(href)',
             'text': 'div.col-lg-8.col-md-12 div.article-body',
             'date': 'div.b_post--date::text',
-            'next_page': 'ul.pagination > li.page-item > a[rel="next"]::attr(href)'
+            'next_page': 'ul.pagination > li.page-item > a[rel="next"]::attr(href)',
+            'next_page_number': 'only_page_number'
         }
     },
     'interfax': {
@@ -339,7 +343,8 @@ media_config = {
             'text': 'div.grid.content > div.col-23 div.article-content',
             'date': 'div.col-27.article-image-wrapper  span:nth-child(2)::text',
             'time': 'div.col-27.article-image-wrapper  span.article-time-big::text',
-            'next_page': 'div.pager > a:nth-child(2)::attr(href)'
+            'next_page': 'div.pager > a:nth-child(2)::attr(href)',
+            'next_page_number': 'only_page_number'
         }
     },
     'hromadske_radio': {
@@ -370,6 +375,7 @@ media_config = {
             # 'date': 'div.date > time:nth-child(1)::text',
             'time': 'div.NewsPublicationCard-time::text',
             'next_page': 'div.NewsPostList-loadMore> a::attr(href)',
+            'next_page_number': 'only_page_number',
             'date_header': 'div.NewsPostList > div.DateHeader > span::text'
         }
     },
@@ -385,6 +391,7 @@ media_config = {
             'time': 'div.time::text',
             'text': 'div.article',
             'next_page': 'div.b_center_pager>ul.pager_list>li.arrow',
+            'next_page_number': 'only_page_number',
             'date_header': 'div.news-list.big.time-stamp > h2::text'
         }
     },
@@ -403,6 +410,7 @@ media_config = {
             'date': 'time::attr(datetime)',
             'views': 'div.hit > span > span.info::text',
             'next_page': 'div.news_paging:nth-child(1)  a.pag_next::attr(href)',
+            'next_page_number': 'only_page_number'
         }
     }
 }
@@ -411,10 +419,8 @@ media_config = {
 def get_media_key_url(url):
     if 'pravda.com' in url:
         return 'pravda'
-    # if 'epravda.com.ua' in url:
-    #     return 'epravda'
-    # if re.match('.*\.epravda\.', url):
-    #     return 'epravda'
+    if re.search(r"epravda", url):
+        return 'epravda'
     elif 'radiosvoboda.org' in url:
         return 'svoboda'
     elif 'obozrevatel.com' in url:
