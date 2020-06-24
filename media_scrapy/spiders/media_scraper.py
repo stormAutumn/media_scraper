@@ -42,15 +42,16 @@ class MediaSpider(scrapy.Spider):
         cursor.execute(sql_query)
         fetched_records = cursor.fetchall()
         records = []
-        p(f'RECORDS{records}')
 
         for record in fetched_records:
             records.append(record[0])
+
         return records
 
     def start_requests(self):
 
-        urls_to_skip = self.get_previously_fetched_urls()
+        # urls_to_skip = self.get_previously_fetched_urls()
+        urls_to_skip = []
 
         for media in media_config.keys():
             # p('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
@@ -59,8 +60,8 @@ class MediaSpider(scrapy.Spider):
             if media != 'svoboda':
                 continue
 
-            date_start = datetime(2020, 6, 1)
-            date_end = datetime(2020, 6, 2)
+            date_start = datetime(2020, 6, 24)
+            date_end = datetime(2020, 6, 24)
             page_number = 1
 
             config = media_config.get(media, {})
@@ -123,9 +124,9 @@ class MediaSpider(scrapy.Spider):
 
         count = 0
         for article in articles:
-            # count += 1
-            # if count > 4:
-            #     return
+            count += 1
+            if count > 2:
+                return
 
             if media_key == 'hromadske' or media_key == 'espreso':
                 date_header = response.css(
@@ -134,7 +135,7 @@ class MediaSpider(scrapy.Spider):
                     article_date = dateparser.parse(date_header, date_formats=[
                         '%d %B'], languages=['uk'])
 
-                    p(f'ARTICLE DATE IS {article_date}')
+                    # p(f'ARTICLE DATE IS {article_date}')
                 else:
                     continue
             else:
@@ -142,10 +143,10 @@ class MediaSpider(scrapy.Spider):
                     article_date_text = articles.css(
                         media_selectors.get('date')).extract_first()
 
-                    p(article_date_text)
+                    # p(article_date_text)
 
                     article_date = parse_date(media_key, article_date_text)
-                    p(f'ARTICLE DATE IS: {article_date}')
+                    # p(f'ARTICLE DATE IS: {article_date}')
                 else:
                     date_response_format = response.meta['date'].strftime(
                         "%d.%m.%Y")
@@ -183,17 +184,17 @@ class MediaSpider(scrapy.Spider):
                 # ---LINK
                 article_href = article.css(
                     media_selectors.get('link')).extract_first()
-                p(f'article_href is: {article_href}')
+                # p(f'article_href is: {article_href}')
                 if 'http' in article_href:
                     article_url = article_href
                 else:
                     article_url = config.get('url_prefix') + article_href
 
-                p(f'article_url is: {article_url}')
+                # p(f'article_url is: {article_url}')
 
                 # --------check whether this link`s been already parsed
                 if article_url in response.meta['urls_to_skip']:
-                    p(article_url + '         ====================    есть в базе')
+                    # p(article_url + '         ====================    есть в базе')
                     continue
 
                 article_loader.add_value('link', article_url)
@@ -209,8 +210,6 @@ class MediaSpider(scrapy.Spider):
                     article_date = dateparser.parse(date_response_format, date_formats=[
                         '%d.%m.%Y'], languages=['uk'])
 
-                article_loader.add_value(
-                    'date', p(f'ARTICLE DATE add {article_date}'))
                 article_loader.add_value('date', article_date)
 
                 # ---SUBTITLE
@@ -248,7 +247,7 @@ class MediaSpider(scrapy.Spider):
                         else:
                             views = views.replace('т', '000')
                     article_loader.add_value('views', views)
-                    p(views)
+                    # p(views)
 
                 yield scrapy.Request(
                     url=article_url,
@@ -272,7 +271,7 @@ class MediaSpider(scrapy.Spider):
                     media_selectors.get('next_page')).extract_first()
 
         if media_selectors.get('next_page_number') != None:
-            media_selectors.get('next_page_number') == 'only_page_number':
+            if media_selectors.get('next_page_number') == 'only_page_number':
                 current_page_number = response.meta.get('page_number')
 
                 # у svoboda ПОКИ тільки одна дата и це має бути кінцева дата
