@@ -97,19 +97,3 @@ def get_media_urls_for_period(media, date_start=None, date_end=None, page_number
         urls.append(url)
         current_dates.append(current_date)
     return urls, current_dates
-
-
-print(
-    get_media_urls_for_period(
-        'hromadske_radio',
-        page_number=1
-    )
-)
-
-# print(
-#     get_media_url(
-#         'hromadske_radio',
-#         date=datetime(2020, 4, 1),
-#         page_number=1
-#     )
-# )

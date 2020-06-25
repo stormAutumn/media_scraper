@@ -27,6 +27,7 @@ def p(message):
 class MediaSpider(scrapy.Spider):
     name = 'media_scraper'
 
+    # TODO: move to utils
     def get_previously_fetched_urls(self):
         settings = get_project_settings()
         db_settings = settings.getdict("DB_SETTINGS")
@@ -38,6 +39,7 @@ class MediaSpider(scrapy.Spider):
                                 password=db_settings['passwd'],
                                 host=db_settings['host'])
         cursor = conn.cursor()
+        # TODO має залежити від списку ЗМІ що обробляється
         sql_query = "SELECT link FROM news_items"
         cursor.execute(sql_query)
         fetched_records = cursor.fetchall()
@@ -49,66 +51,56 @@ class MediaSpider(scrapy.Spider):
         return records
 
     def start_requests(self):
-
-        # urls_to_skip = self.get_previously_fetched_urls()
-        urls_to_skip = []
+        urls_to_skip = self.get_previously_fetched_urls()
 
         for media in media_config.keys():
-            # p('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-            # p(media)
-            # p('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
             if media != 'svoboda':
                 continue
 
-            date_start = datetime(2020, 6, 22)
-            date_end = datetime(2020, 6, 23)
+            date_start = datetime(2020, 6, 23)
+            date_end = datetime(2020, 6, 24)
             page_number = 1
 
-            config = media_config.get(media, {})
+            config = media_config[media]
+
+            urls_dates = ()
+
             if config.get('spider') == 'pages_scraper':
-                start_url = get_media_url(
+                if media == 'svoboda':
+                    # у свободы ПОКА только одна дата и єто должна біть конечная дата
+                    urls_dates = (
+                        [get_media_url(media,
+                                       date=date_end,
+                                       page_number=page_number)],
+                        [date_end]
+                    )
+                else:
+                    urls_dates = (
+                        [get_media_url(media,
+                                       date=date_start,
+                                       page_number=page_number)],
+                        [date_start]
+                    )
+
+            else:
+                urls_dates = get_media_urls_for_period(
                     media,
-                    date=date_start,
+                    date_start=date_start,
+                    date_end=date_end,
                     page_number=page_number
                 )
 
-                if media == 'svoboda':
-                    # у свободы ПОКА только одна дата и єто должна біть конечная дата
-                    start_url = get_media_url(
-                        media,
-                        date=date_end,
-                        page_number=page_number)
-
-                    p(start_url)
-                    return
+            for url, date in zip(*urls_dates):
                 yield scrapy.Request(
-                    url=start_url,
+                    url=url,
                     callback=self.parse_article_headers,
                     meta={
-                        'date': date_start,
+                        'date': date,
                         'date_end': date_end,
                         'page_number': page_number,
                         'urls_to_skip': urls_to_skip
                     }
                 )
-
-            else:
-                urls_dates = get_media_urls_for_period(
-                    media, date_start=date_start, date_end=date_end, page_number=page_number)
-                # p(urls_dates)
-                # return
-
-                for url, date in zip(*urls_dates):
-                    yield scrapy.Request(
-                        url=url,
-                        callback=self.parse_article_headers,
-                        meta={
-                            'date': date,
-                            'date_end': date_end,
-                            'page_number': page_number,
-                            'urls_to_skip': urls_to_skip
-                        }
-                    )
 
     def parse_article_headers(self, response):
         media_key = get_media_key_url(response.request.url)
