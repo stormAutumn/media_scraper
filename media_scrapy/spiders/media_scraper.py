@@ -11,8 +11,7 @@ import dateparser
 import psycopg2
 from bs4 import BeautifulSoup
 
-
-from media_config import media_config, get_media_key_url, get_url_with_domain
+from media_config import media_config, get_url_with_domain
 from get_date import get_media_urls_for_period, get_media_url
 from scrapy.utils.project import get_project_settings
 from parse_date import parse_date
@@ -95,6 +94,7 @@ class MediaSpider(scrapy.Spider):
                     url=url,
                     callback=self.parse_article_headers,
                     meta={
+                        'media': media,
                         'date': date,
                         'date_end': date_end,
                         'page_number': page_number,
@@ -103,17 +103,14 @@ class MediaSpider(scrapy.Spider):
                 )
 
     def parse_article_headers(self, response):
-        media_key = get_media_key_url(response.request.url)
-        config = media_config.get(media_key, {})
-        media_selectors = config.get('selectors')
+        media = response.meta['media']
+        config = media_config[media]
+        media_selectors = config['selectors']
 
         date_start = response.meta['date']
         date_end = response.meta['date_end']
 
-        # p(date_start)
-        # p(date_end)
-        # return
-        articles = response.css(media_selectors.get('main_container'))
+        articles = response.css(media_selectors['main_container'])
 
         count = 0
         for article in articles:
@@ -121,7 +118,7 @@ class MediaSpider(scrapy.Spider):
             # if count > 5:
             #     return
 
-            if media_key == 'hromadske' or media_key == 'espreso':
+            if media == 'hromadske' or media == 'espreso':
                 date_header = response.css(
                     media_selectors.get('date_header')).extract_first()
                 if date_header != None:
@@ -138,7 +135,7 @@ class MediaSpider(scrapy.Spider):
 
                     # p(article_date_text)
 
-                    article_date = parse_date(media_key, article_date_text)
+                    article_date = parse_date(media, article_date_text)
                     p(f'ARTICLE DATE IS: {article_date}')
                 else:
                     date_response_format = response.meta['date'].strftime(
@@ -197,7 +194,7 @@ class MediaSpider(scrapy.Spider):
                 if media_selectors.get('date') != None:
                     date_response_format = article.css(
                         media_selectors.get('date')).extract_first()
-                    article_date = parse_date(media_key, date_response_format)
+                    article_date = parse_date(media, date_response_format)
                 else:
                     date_response_format = response.meta['date'].strftime(
                         "%d.%m.%Y")
@@ -246,7 +243,10 @@ class MediaSpider(scrapy.Spider):
                 yield scrapy.Request(
                     url=article_url,
                     callback=self.parse_article_body,
-                    meta={'article_loader': article_loader}
+                    meta={
+                        'media': media,
+                        'article_loader': article_loader
+                    }
                 )
 
             else:
@@ -257,7 +257,7 @@ class MediaSpider(scrapy.Spider):
         # ----------GETTING NEXT PAGE IF THERE IS SOME ------------------
 
         if media_selectors.get('next_page') != None:
-            if media_key == 'espreso':
+            if media == 'espreso':
                 next_page_button_url = response.css(
                     media_selectors.get('next_page'))[-1].extract()
             else:
@@ -272,7 +272,7 @@ class MediaSpider(scrapy.Spider):
 
                     # у svoboda ПОКИ тільки одна дата и це має бути кінцева дата
                     next_page_url = get_media_url(
-                        media_key,
+                        media,
                         date=date_end,
                         page_number=current_page_number+1
                     )
@@ -290,7 +290,7 @@ class MediaSpider(scrapy.Spider):
                 if next_page_button_url != None:
                     current_page_number = response.meta.get('page_number')
                     next_page_url = get_media_url(
-                        media_key,
+                        media,
                         date=date_end,
                         page_number=current_page_number+1)
                     new_meta = response.meta.copy()
@@ -301,13 +301,13 @@ class MediaSpider(scrapy.Spider):
                         meta=new_meta,
                     )
 
-            if media_key == 'liga':
+            if media == 'liga':
                 if next_page_button_url != None and 'page' in next_page_button_url:
 
                     p('GOING TO THE NEXT PAGE')
                     current_page_number = response.meta.get('page_number')
                     next_page_url = get_media_url(
-                        media_key,
+                        media,
                         date=date_end,
                         page_number=current_page_number+1)
 
@@ -320,7 +320,7 @@ class MediaSpider(scrapy.Spider):
                         meta=new_meta,
                     )
 
-# =================================== can`t get this moment
+        # =================================== can`t get this moment
             # if next_page_button_url != None:
             #     if 'http' in next_page_button_url:
             #         next_page_url = next_page_button_url
@@ -333,15 +333,13 @@ class MediaSpider(scrapy.Spider):
                 #     callback=self.parse_article_headers,
                 #     meta=response.meta.copy(),)
 
-# ---------- PARSE ARTICLE BODY ------------------
-
     def parse_article_body(self, response):
-        media_key = get_media_key_url(response.request.url)
-        config = media_config.get(media_key, {})
-        media_selectors = config.get('selectors')
-        text = response.css(media_selectors.get('text')).extract_first()
+        media = response.meta['media']
+        media_selectors = media_config[media]['selectors']
+        text = response.css(media_selectors['text']).extract_first()
 
         article_loader = response.meta['article_loader']
 
         article_loader.add_value('text', text)
+
         yield article_loader.load_item()

@@ -1,4 +1,5 @@
 import re
+
 media_config = {
     'pravda': {
         'spider': 'media_scraper',
@@ -417,67 +418,67 @@ media_config = {
 }
 
 
-def get_media_key_url(url):
-    if 'pravda.com' in url:
-        return 'pravda'
-    if re.search(r"epravda", url):
-        return 'epravda'
-    elif 'radiosvoboda.org' in url:
-        return 'svoboda'
-    elif 'obozrevatel.com' in url:
-        return 'obozrevatel'
-    elif 'www.rbc.ua' in url:
-        return 'rbc'
-    elif 'censor.net' in url:
-        return 'censor'
-    elif 'liga.net' in url:
-        return 'liga'
-    elif '112.ua' in url:
-        return '112'
-    elif 'unian.ua' in url:
-        return 'unian'
-    elif 'lb.ua' in url:
-        return 'LB'
-    elif 'zik.ua' in url:
-        return 'zik'
-    elif 'segodnya.ua' in url:
-        return 'segodnya'
-    elif '24tv.ua' in url:
-        return '24tv'
-    elif 'tsn.ua' in url:
-        return 'tsn'
-    elif 'fakty.com.ua' in url:
-        return 'ictv'
-    elif 'strana.ua' in url:
-        return 'strana'
-    elif 'znaj.ua' in url:
-        return 'znaj'
-    elif 'gordonua.com' in url:
-        return 'gordonua'
-    elif 'apostrophe.ua' in url:
-        return 'apostrophe'
-    elif 'unn.com.ua' in url:
-        return 'unn'
-    elif 'focus.ua' in url:
-        return 'focus'
-    elif 'ukranews.com' in url:
-        return 'ukranews'
-    elif 'dt.ua' in url:
-        return 'dzerkalo_tyzhnya'
-    elif 'politeka.net' in url:
-        return 'politeka'
-    elif 'ua.interfax.com.ua' in url:
-        return 'interfax'
-    elif 'hromadske.radio' in url:
-        return 'hromadske_radio'
-    elif 'https://hromadske.ua/' in url:
-        return 'hromadske'
-    elif 'censor.net.ua' in url:
-        return 'censor'
-    elif 'https://espreso.tv' in url:
-        return 'espreso'
-    else:
-        print('========== Unknown media url =============')
+# def get_media_key_url(url):
+#     if 'pravda.com' in url:
+#         return 'pravda'
+#     if re.search(r"epravda", url):
+#         return 'epravda'
+#     elif 'radiosvoboda.org' in url:
+#         return 'svoboda'
+#     elif 'obozrevatel.com' in url:
+#         return 'obozrevatel'
+#     elif 'www.rbc.ua' in url:
+#         return 'rbc'
+#     elif 'censor.net' in url:
+#         return 'censor'
+#     elif 'liga.net' in url:
+#         return 'liga'
+#     elif '112.ua' in url:
+#         return '112'
+#     elif 'unian.ua' in url:
+#         return 'unian'
+#     elif 'lb.ua' in url:
+#         return 'LB'
+#     elif 'zik.ua' in url:
+#         return 'zik'
+#     elif 'segodnya.ua' in url:
+#         return 'segodnya'
+#     elif '24tv.ua' in url:
+#         return '24tv'
+#     elif 'tsn.ua' in url:
+#         return 'tsn'
+#     elif 'fakty.com.ua' in url:
+#         return 'ictv'
+#     elif 'strana.ua' in url:
+#         return 'strana'
+#     elif 'znaj.ua' in url:
+#         return 'znaj'
+#     elif 'gordonua.com' in url:
+#         return 'gordonua'
+#     elif 'apostrophe.ua' in url:
+#         return 'apostrophe'
+#     elif 'unn.com.ua' in url:
+#         return 'unn'
+#     elif 'focus.ua' in url:
+#         return 'focus'
+#     elif 'ukranews.com' in url:
+#         return 'ukranews'
+#     elif 'dt.ua' in url:
+#         return 'dzerkalo_tyzhnya'
+#     elif 'politeka.net' in url:
+#         return 'politeka'
+#     elif 'ua.interfax.com.ua' in url:
+#         return 'interfax'
+#     elif 'hromadske.radio' in url:
+#         return 'hromadske_radio'
+#     elif 'https://hromadske.ua/' in url:
+#         return 'hromadske'
+#     elif 'censor.net.ua' in url:
+#         return 'censor'
+#     elif 'https://espreso.tv' in url:
+#         return 'espreso'
+#     else:
+#         print('========== Unknown media url =============')
 
 
 def get_url_with_domain(media, local_url):
