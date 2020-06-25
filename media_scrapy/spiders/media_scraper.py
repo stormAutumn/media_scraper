@@ -60,13 +60,12 @@ class MediaSpider(scrapy.Spider):
             if media != 'svoboda':
                 continue
 
-            date_start = datetime(2020, 6, 24)
-            date_end = datetime(2020, 6, 24)
+            date_start = datetime(2020, 6, 22)
+            date_end = datetime(2020, 6, 23)
             page_number = 1
 
             config = media_config.get(media, {})
             if config.get('spider') == 'pages_scraper':
-                # p(media)
                 start_url = get_media_url(
                     media,
                     date=date_start,
@@ -80,6 +79,8 @@ class MediaSpider(scrapy.Spider):
                         date=date_end,
                         page_number=page_number)
 
+                    p(start_url)
+                    return
                 yield scrapy.Request(
                     url=start_url,
                     callback=self.parse_article_headers,
@@ -94,8 +95,8 @@ class MediaSpider(scrapy.Spider):
             else:
                 urls_dates = get_media_urls_for_period(
                     media, date_start=date_start, date_end=date_end, page_number=page_number)
-                # print("URLS")
                 # p(urls_dates)
+                # return
 
                 for url, date in zip(*urls_dates):
                     yield scrapy.Request(
@@ -124,9 +125,9 @@ class MediaSpider(scrapy.Spider):
 
         count = 0
         for article in articles:
-            count += 1
-            if count > 2:
-                return
+            # count += 1
+            # if count > 5:
+            #     return
 
             if media_key == 'hromadske' or media_key == 'espreso':
                 date_header = response.css(
@@ -146,12 +147,13 @@ class MediaSpider(scrapy.Spider):
                     # p(article_date_text)
 
                     article_date = parse_date(media_key, article_date_text)
-                    # p(f'ARTICLE DATE IS: {article_date}')
+                    p(f'ARTICLE DATE IS: {article_date}')
                 else:
                     date_response_format = response.meta['date'].strftime(
                         "%d.%m.%Y")
                     article_date = dateparser.parse(date_response_format, date_formats=[
                         '%d.%m.%Y'], languages=['uk'])
+                    p(f'ARTICLE DATE IS: {article_date}')
 
             if article_date.date() > date_end.date():
                 print(
@@ -270,26 +272,27 @@ class MediaSpider(scrapy.Spider):
                 next_page_button_url = response.css(
                     media_selectors.get('next_page')).extract_first()
 
-        if media_selectors.get('next_page_number') != None:
-            if media_selectors.get('next_page_number') == 'only_page_number':
-                current_page_number = response.meta.get('page_number')
+            p(next_page_button_url)
 
-                # у svoboda ПОКИ тільки одна дата и це має бути кінцева дата
-                next_page_url = get_media_url(
-                    media_key,
-                    date=date_end,
-                    page_number=current_page_number+1
-                )
-                new_meta = response.meta.copy()
+            if media_selectors.get('next_page_number') != None:
+                if media_selectors.get('next_page_number') == 'only_page_number':
+                    current_page_number = response.meta.get('page_number')
 
-                new_meta['page_number'] = current_page_number + 1
+                    # у svoboda ПОКИ тільки одна дата и це має бути кінцева дата
+                    next_page_url = get_media_url(
+                        media_key,
+                        date=date_end,
+                        page_number=current_page_number+1
+                    )
+                    new_meta = response.meta.copy()
 
-                yield scrapy.Request(
-                    url=next_page_url,
-                    callback=self.parse_article_headers,
-                    meta=new_meta,
-                )
-                return
+                    new_meta['page_number'] = current_page_number + 1
+
+                    yield scrapy.Request(
+                        url=next_page_url,
+                        callback=self.parse_article_headers,
+                        meta=new_meta,
+                    )
 
             if media_selectors.get('next_page_number') == 'page_and_date':
                 if next_page_button_url != None:
@@ -308,11 +311,14 @@ class MediaSpider(scrapy.Spider):
 
             if media_key == 'liga':
                 if next_page_button_url != None and 'page' in next_page_button_url:
+
+                    p('GOING TO THE NEXT PAGE')
                     current_page_number = response.meta.get('page_number')
                     next_page_url = get_media_url(
                         media_key,
                         date=date_end,
                         page_number=current_page_number+1)
+
                     new_meta = response.meta.copy()
                     new_meta['page_number'] = current_page_number + 1
 
@@ -323,12 +329,12 @@ class MediaSpider(scrapy.Spider):
                     )
 
 # =================================== can`t get this moment
-            if next_page_button_url != None:
-                if 'http' in next_page_button_url:
-                    next_page_url = next_page_button_url
-                else:
-                    next_page_url = config.get(
-                        'url_prefix') + next_page_button_url
+            # if next_page_button_url != None:
+            #     if 'http' in next_page_button_url:
+            #         next_page_url = next_page_button_url
+            #     else:
+            #         next_page_url = config.get(
+            #             'url_prefix') + next_page_button_url
 
                 # yield scrapy.Request(
                 #     url=next_page_url,
