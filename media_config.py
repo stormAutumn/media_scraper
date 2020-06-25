@@ -98,10 +98,10 @@ media_config = {
         }
     },
     'zik': {
-        'spider': 'pages_scraper',
+        'spider': 'media_scraper',
         'domain': 'zik.ua',
         'url_prefix': 'https://zik.ua',
-        'url_template': 'https://zik.ua/sitemap/2020/{date}',
+        'url_template': 'https://zik.ua/sitemap/2020/{date}?pg={page_number}',
         'selectors': {
             'main_container': 'div.b-archive-news-list > ul.news-list > li.news-list-item',
             'title': 'a::text',
@@ -109,7 +109,8 @@ media_config = {
             'link': 'a::attr(href)',
             'time': 'time.time::text',
             'pages': 'ul.pagination-box > li.active > a::attr(href)',
-            'next_page': 'div.b-archive-news-list > ul.pagination-box > li.active + li > a::attr(href)'
+            'next_page': 'div.b-archive-news-list > ul.pagination-box > li.active + li > a::attr(href)',
+            'next_page_number': 'page_and_date'
         }
     },
     'segodnya': {
