@@ -12,9 +12,10 @@ import psycopg2
 from bs4 import BeautifulSoup
 
 from media_config import media_config, get_url_with_domain
-from get_date import get_media_urls_for_period, get_media_url
+from utils import get_media_urls_for_period, get_media_url
 from scrapy.utils.project import get_project_settings
-from parse_date import parse_date
+from utils import parse_date
+from utils import get_clean_text
 
 
 def p(message):
@@ -181,35 +182,22 @@ class MediaSpider(scrapy.Spider):
                     'domain', config.get('domain'))
 
                 # ---TITLE
-                # TODO extract this cleaning to util function get_clean_text(dirty_text_list)
                 title_text_dirty_list = article.css(
                     selectors['title']).extract()
-                title_text = ''.join(title_text_dirty_list)
-                title_stripped = title_text.strip()
-                title_clean = title_stripped.replace('\n,', '')
+                title_clean = get_clean_text(title_text_dirty_list)
                 article_loader.add_value('title', title_clean)
 
                 # ---SUBTITLE
                 if selectors.get('subtitle') != None:
-                    # TODO використату ту саму утіліту що й для Title
                     subtitle_text_list = article.css(
                         selectors['subtitle']).extract()
-
-                    subtitle_text = ''.join(subtitle_text_list)
-
-                    subtitle_stripped = subtitle_text.strip()
-                    subtitle = subtitle_stripped.replace('\t,\n,', '')
+                    subtitle = get_clean_text(subtitle_text_list)
                     article_loader.add_value('subtitle', subtitle)
 
                 # ---TIME
                 if selectors.get('time') != None:
-                    # TODO extract to cleaning utility function
                     time_text = article.css(selectors['time']).extract()
-                    time_string = ''.join(time_text)
-                    time = time_string.replace(',', '').replace('\n', '')
-                    time_stripped = time.strip()
-                    time_parsed = datetime.strptime(
-                        time_stripped, "%H:%M").time()
+                    time_parsed = get_clean_time(time_text)
                     article_loader.add_value('time', time_parsed)
 
                 # ---VIEWS

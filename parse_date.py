@@ -1,5 +1,4 @@
 import dateparser
-# from m_pages_config import media_with_pages_config
 
 
 def parse_date(media, date_response_format):
