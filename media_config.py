@@ -306,7 +306,7 @@ media_config = {
         'spider': 'pages_scraper',
         'domain': 'fakty.com.ua',
         'url_prefix': '',
-        'url_template': 'https://fakty.com.ua/ua/news/',
+        'url_template': 'https://fakty.com.ua/ua/news/page/{page_number}/',
         'selectors': {
             'main_container': 'div#all_news_page>ul>li',
             'title': 'a>div.tape_title_small::text',
@@ -343,8 +343,7 @@ media_config = {
             'title': 'div.col-57 > h1.article-link-wrapper > a::text',
             'link': 'div.col-57 > h1.article-link-wrapper > a::attr(href)',
             'text': 'div.grid.content > div.col-23 div.article-content',
-            'date': 'div.col-27.article-image-wrapper  span:nth-child(2)::text',
-            'time': 'div.col-27.article-image-wrapper  span.article-time-big::text',
+            'date': 'div.article-image-wrapper .article-time *::text',
             'next_page': 'div.pager > a:nth-child(2)::attr(href)',
             'next_page_number': 'only_page_number'
         }
@@ -404,7 +403,7 @@ media_config = {
         'url_prefix': '',
         'url_template': 'https://censor.net.ua/news/all/page/{page_number}/category/0/interval/5/sortby/date',
         'selectors': {
-            'main_container': 'article.item',
+            'main_container': 'section.news article.item',
             'title': 'a::text',
             'subtitle': 'div.anounce > a::text',
             'link': 'div.anounce > a::attr(href)',
