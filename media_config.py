@@ -2,7 +2,7 @@ import re
 
 media_config = {
     'pravda': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://www.pravda.com.ua',
         'url_prefix': 'https://www.pravda.com.ua',
         'url_template': 'https://www.pravda.com.ua/archives/date_{date}',
@@ -16,7 +16,7 @@ media_config = {
         }
     },
     'epravda': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://www.epravda.com.ua',
         'url_prefix': 'https://www.epravda.com.ua',
         'url_template': 'https://www.epravda.com.ua/archives/date_{date}',
@@ -30,7 +30,7 @@ media_config = {
         }
     },
     'obozrevatel': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://www.obozrevatel.com',
         'url_prefix': '',
         'url_template': 'https://www.obozrevatel.com/ukr/main-item/{date}.htm',
@@ -45,7 +45,7 @@ media_config = {
         }
     },
     'rbc': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://www.rbc.ua',
         'url_prefix': '',
         'url_template': 'https://www.rbc.ua/ukr/archive/{date}',
@@ -58,7 +58,7 @@ media_config = {
         }
     },
     'liga': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://www.liga.net',
         'url_prefix': '',
         'url_template': 'https://www.liga.net/archive/{date}/all/page/{page_number}',
@@ -72,7 +72,7 @@ media_config = {
         }
     },
     'unian': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://www.unian.ua',
         'url_prefix': '',
         'url_template': 'https://www.unian.ua/news/archive/{date}',
@@ -85,7 +85,7 @@ media_config = {
         }
     },
     'LB': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://ukr.lb.ua',
         'url_prefix': '',
         'url_template': 'https://ukr.lb.ua/archive/{date}',
@@ -99,7 +99,7 @@ media_config = {
         }
     },
     'zik': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'zik.ua',
         'url_prefix': 'https://zik.ua',
         'url_template': 'https://zik.ua/sitemap/2020/{date}?pg={page_number}',
@@ -115,7 +115,7 @@ media_config = {
         }
     },
     'segodnya': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://www.segodnya.ua/ua',
         'url_prefix': 'https://www.segodnya.ua',
         'url_template': 'https://www.segodnya.ua/ua/newsitemap/{date}.html',
@@ -127,7 +127,7 @@ media_config = {
         }
     },
     '24tv': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': '24tv.ua',
         'url_prefix': '',
         'url_template': 'https://24tv.ua/archive/{date}/',
@@ -141,7 +141,7 @@ media_config = {
         }
     },
     'tsn': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'tsn.ua',
         'url_prefix': '',
         'url_template': 'https://tsn.ua/archive/{date}',
@@ -156,7 +156,7 @@ media_config = {
         }
     },
     'gordonua': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'gordonua.com',
         'url_prefix': 'https://gordonua.com/ukr',
         'url_template': 'https://gordonua.com/ukr/news/archive/{date}.html',
@@ -170,7 +170,7 @@ media_config = {
         }
     },
     'apostrophe': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'apostrophe.ua',
         'url_prefix': '',
         'url_template': 'https://apostrophe.ua/ua/archives/{date}',
@@ -184,7 +184,7 @@ media_config = {
         }
     },
     'unn': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'www.unn.com.ua',
         'url_prefix': 'https://www.unn.com.ua',
         'url_template': 'https://www.unn.com.ua/uk/news/{date}',
@@ -198,7 +198,7 @@ media_config = {
         }
     },
     'focus': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'focus.ua',
         'url_prefix': 'https://focus.ua',
         'url_template': 'https://focus.ua/news/{date}',
@@ -211,7 +211,7 @@ media_config = {
         }
     },
     'ukranews': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://ukranews.com',
         'url_prefix': 'https://ukranews.com',
         'url_template': 'https://ukranews.com/archiv/date_from/{date}/date_to/{date_end}/page/{page_number}',
@@ -226,7 +226,7 @@ media_config = {
     },
     # у Свободы пока что умеем обрабатывать только 100 страниц
     'svoboda': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'www.radiosvoboda.org',
         'url_prefix': 'https://www.radiosvoboda.org',
         'url_template': 'https://www.radiosvoboda.org/z/630/{date}?p={page_number}',
@@ -241,7 +241,7 @@ media_config = {
     },
     '112': {
         #robots_obey = False in settings
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': '112.ua',
         'url_prefix': 'https://ua.112.ua',
         'url_template': 'https://ua.112.ua/archive/p2?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
@@ -256,7 +256,7 @@ media_config = {
         }
     },
     'dzerkalo_tyzhnya': {
-        'spider': 'media_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'https://dt.ua/',
         'url_prefix': 'https://dt.ua',
         'url_template': 'https://dt.ua/all-news/?page={page_number}&date={date}',
@@ -272,7 +272,7 @@ media_config = {
         }
     },
     'strana': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'strana.ua',
         'url_prefix': 'https://strana.ua',
         'url_template': 'https://strana.ua/archive/day={date}/page-{page_number}.html',
@@ -288,7 +288,7 @@ media_config = {
         }
     },
     'znaj': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'znaj.ua',
         'url_prefix': '',
         'url_template': 'https://znaj.ua/news?page={page_number}',
@@ -303,7 +303,7 @@ media_config = {
         }
     },
     'ictv': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'fakty.com.ua',
         'url_prefix': '',
         'url_template': 'https://fakty.com.ua/ua/news/page/{page_number}/',
@@ -318,7 +318,7 @@ media_config = {
         }
     },
     'politeka': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'https://politeka.net/uk',
         'url_prefix': '',
         'url_template': 'https://politeka.net/uk/newsfeed?page={page_number}',
@@ -334,7 +334,7 @@ media_config = {
         }
     },
     'interfax': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'https://ua.interfax.com.ua',
         'url_prefix': 'https://ua.interfax.com.ua',
         'url_template': 'https://ua.interfax.com.ua/news/latest-{page_number}.html',
@@ -349,7 +349,7 @@ media_config = {
         }
     },
     'hromadske_radio': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'https://hromadske.radio',
         'url_prefix': 'https://hromadske.radio',
         'url_template': 'https://hromadske.radio/news/page/{page_number}',
@@ -364,7 +364,7 @@ media_config = {
         }
     },
     'hromadske': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'https://hromadske.ua/',
         'url_prefix': 'https://hromadske.ua',
         'url_template': 'https://hromadske.ua/news?page={page_number}',
@@ -381,7 +381,7 @@ media_config = {
         }
     },
     'espreso': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'espreso.tv',
         'url_prefix': 'https://espreso.tv',
         'url_template': 'https://espreso.tv/news?page={page_number}/',
@@ -398,7 +398,7 @@ media_config = {
     },
     # цензор банить, якщо великий інтервал дат. збільшення time_out in setting doesn`t help
     'censor': {
-        'spider': 'pages_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'https://censor.net.ua',
         'url_prefix': '',
         'url_template': 'https://censor.net.ua/news/all/page/{page_number}/category/0/interval/5/sortby/date',
@@ -414,97 +414,4 @@ media_config = {
             'next_page_number': 'only_page_number'
         }
     }
-}
-
-
-# def get_media_key_url(url):
-#     if 'pravda.com' in url:
-#         return 'pravda'
-#     if re.search(r"epravda", url):
-#         return 'epravda'
-#     elif 'radiosvoboda.org' in url:
-#         return 'svoboda'
-#     elif 'obozrevatel.com' in url:
-#         return 'obozrevatel'
-#     elif 'www.rbc.ua' in url:
-#         return 'rbc'
-#     elif 'censor.net' in url:
-#         return 'censor'
-#     elif 'liga.net' in url:
-#         return 'liga'
-#     elif '112.ua' in url:
-#         return '112'
-#     elif 'unian.ua' in url:
-#         return 'unian'
-#     elif 'lb.ua' in url:
-#         return 'LB'
-#     elif 'zik.ua' in url:
-#         return 'zik'
-#     elif 'segodnya.ua' in url:
-#         return 'segodnya'
-#     elif '24tv.ua' in url:
-#         return '24tv'
-#     elif 'tsn.ua' in url:
-#         return 'tsn'
-#     elif 'fakty.com.ua' in url:
-#         return 'ictv'
-#     elif 'strana.ua' in url:
-#         return 'strana'
-#     elif 'znaj.ua' in url:
-#         return 'znaj'
-#     elif 'gordonua.com' in url:
-#         return 'gordonua'
-#     elif 'apostrophe.ua' in url:
-#         return 'apostrophe'
-#     elif 'unn.com.ua' in url:
-#         return 'unn'
-#     elif 'focus.ua' in url:
-#         return 'focus'
-#     elif 'ukranews.com' in url:
-#         return 'ukranews'
-#     elif 'dt.ua' in url:
-#         return 'dzerkalo_tyzhnya'
-#     elif 'politeka.net' in url:
-#         return 'politeka'
-#     elif 'ua.interfax.com.ua' in url:
-#         return 'interfax'
-#     elif 'hromadske.radio' in url:
-#         return 'hromadske_radio'
-#     elif 'https://hromadske.ua/' in url:
-#         return 'hromadske'
-#     elif 'censor.net.ua' in url:
-#         return 'censor'
-#     elif 'https://espreso.tv' in url:
-#         return 'espreso'
-#     else:
-#         print('========== Unknown media url =============')
-
-
-def get_url_with_domain(media, local_url):
-    if not 'http' in local_url:
-        return media_config.get(media) + local_url
-    return link
-
-
-date_formats = {
-    'interfax': '%d.%m.%Y',
-    'hromadske_radio': '%d.%m.%Y',
-    'politeka': '%H:%M %d.%m',
-    'svoboda': '%d %B %Y',
-    '112': '%d.%m.%Y',
-    'znaj': '%H:%M, %d.%m',
-    'strana': '%d %B %Y, %H:%M',  # languages=['ru']
-    'ukranews': '%d %B %Y, %H:%M',  # languages=['ru']
-    'ictv': '%B, %d о %H:%M',
-    'hromadske': '%d %B',
-    'liga': '%d.%m.%Y %H:%M',  # time column!
-    '24tv': '%#d %B, %H:%M',
-    'dzerkalo_tyzhnya': '%d.%m.%Y, %H:%M',
-    'tsn': '%#d %B %H:%M',
-    'obozrevatel': '%d.%m.%Y',
-    'segodnya': '%d.%m.%Y',
-    'unn': '%d.%m.%Y',
-    'gordonua': '%#d %B, %Y %H:%M',  # заменить '.' в дате на ":"
-    'unian': '%H:%M, %d %B %Y',  # time column
-    'LB': '%Y-%m-%dT%H:%M:%SZ'
 }
