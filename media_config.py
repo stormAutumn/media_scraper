@@ -98,6 +98,7 @@ media_config = {
             'date': 'time::attr(datetime)'
         }
     },
+    # zik requires AUTOTHROTTLE_ENABLED = true and futher delays
     'zik': {
         'start_request_type': 'media_scraper',
         'domain': 'zik.ua',
@@ -120,7 +121,7 @@ media_config = {
         'url_prefix': 'https://www.segodnya.ua',
         'url_template': 'https://www.segodnya.ua/ua/newsitemap/{date}.html',
         'selectors': {
-            'main_container': 'hr+a',
+            'main_container': 'a:nth-child(n+8)',
             'title': '::text',
             'text': 'article.article',
             'link': '::attr(href)'
@@ -211,7 +212,7 @@ media_config = {
         }
     },
     'ukranews': {
-        'start_request_type': 'media_scraper',
+        'start_request_type': 'pages_scraper',
         'domain': 'https://ukranews.com',
         'url_prefix': 'https://ukranews.com',
         'url_template': 'https://ukranews.com/archiv/date_from/{date}/date_to/{date_end}/page/{page_number}',
@@ -221,6 +222,7 @@ media_config = {
             'text': 'div.article_content',
             'link': '::attr(href)',
             'date': 'div.text > div.tape_news__info > span.tape_news__date::text',
+            'views': 'div.text > div.tape_news__info > span.tape_news__date::text',
             'next_page': 'ul.pagination > li.arrow:last-child > a::attr(href)'
         },
     },
@@ -258,8 +260,8 @@ media_config = {
     'dzerkalo_tyzhnya': {
         'start_request_type': 'media_scraper',
         'domain': 'https://dt.ua/',
-        'url_prefix': 'https://dt.ua',
-        'url_template': 'https://dt.ua/all-news/?page={page_number}&date={date}',
+        'url_prefix': 'https://zn.ua',
+        'url_template': 'https://zn.ua/ukr/all-news/date={date}/p{page_number}',
         'selectors': {
             'main_container': 'ul.news_list > li > a',
             'title': 'span.news_anounce > span.news_title::text',
@@ -272,7 +274,7 @@ media_config = {
         }
     },
     'strana': {
-        'start_request_type': 'pages_scraper',
+        'start_request_type': 'media_scraper',
         'domain': 'strana.ua',
         'url_prefix': 'https://strana.ua',
         'url_template': 'https://strana.ua/archive/day={date}/page-{page_number}.html',

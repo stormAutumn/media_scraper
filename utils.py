@@ -122,7 +122,11 @@ def parse_date(media, date_response_format):
     if media == 'ictv':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%B, %d о %H:%M'], languages=['uk'])
-    if media == 'strana' or media == 'ukranews':
+    if media == 'strana':
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%d %B %Y, %H:%M'], languages=['ru'])
+    if media == 'ukranews':
+        date_response_format = date_response_format.rsplit(' ', 1)[0]
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y, %H:%M'], languages=['ru'])
     if media == 'znaj':
