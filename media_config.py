@@ -261,7 +261,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'https://dt.ua/',
         'url_prefix': 'https://zn.ua',
-        'url_template': 'https://zn.ua/ukr/all-news/date={date}/p{page_number}',
+        'url_template': 'https://zn.ua/ukr/all-news/date={date}',
         'selectors': {
             'main_container': 'ul.news_list > li > a',
             'title': 'span.news_anounce > span.news_title::text',
@@ -371,11 +371,10 @@ media_config = {
         'url_prefix': 'https://hromadske.ua',
         'url_template': 'https://hromadske.ua/news?page={page_number}',
         'selectors': {
-            'main_container': 'div.NewsPostList > a',
+            'main_container': 'div.NewsPostList>a',
             'title': 'div.NewsPublicationCard-title::text',
             'link': '::attr(href)',
             'text': 'div.PostPreview-contentWrapper',
-            # 'date': 'div.date > time:nth-child(1)::text',
             'time': 'div.NewsPublicationCard-time::text',
             'next_page': 'div.NewsPostList-loadMore> a::attr(href)',
             'next_page_number': 'only_page_number',

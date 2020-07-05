@@ -58,11 +58,14 @@ class MediaSpider(scrapy.Spider):
             selectors = config['selectors']
             # if selectors.get('next_page_number') != 'only_page_number':
             #     continue
-            if media != '112':
+            if media != 'epravda':
                 continue
 
-            date_start = datetime(2020, 6, 29)
-            date_end = datetime(2020, 6, 29)
+            date_start = datetime(2020, 2, 1)
+            date_end = datetime(2020, 5, 31)
+
+            ###########################################
+            # CHANGE!!!
             page_number = 1
 
             urls_dates = ()
@@ -79,7 +82,7 @@ class MediaSpider(scrapy.Spider):
                 else:
                     # DELETE AFTER SCRAPING
                     if media == 'censor':
-                        page_number = 205
+                        page_number = 195
                     # -----------------------------
                     urls_dates = (
                         [get_media_url(media,
@@ -98,6 +101,7 @@ class MediaSpider(scrapy.Spider):
                 )
 
             p(urls_dates)
+            # return
 
             for url, date in zip(*urls_dates):
                 yield scrapy.Request(
@@ -124,17 +128,20 @@ class MediaSpider(scrapy.Spider):
 
         count = 0
         for article in all_articles:
-            # count += 1
-            # if count > 5:
-            #     return
+            count += 1
+            if count > 30:
+                return
 
             # TODO треба винести поза цикл бо ця перевірка не залежить від article
             # СХОЖЕ що тут є проблема коли сторінка вміщує новини за 2 дні (межа днів):
             # в такому випадку новини попереднього дня будуть зберігатися як новини наступного
             # TODO перевырити після починки пагінатора
-            if media == 'hromadske' or media == 'espreso':
+            if media == 'hromadske':  # or media == 'espreso':
                 date_header = response.css(
                     selectors['date_header']).extract_first()
+
+                p(date_header)
+
                 if date_header != None:
                     article_date = dateparser.parse(date_header, date_formats=[
                         '%d %B'], languages=['uk'])
@@ -146,8 +153,6 @@ class MediaSpider(scrapy.Spider):
                 if selectors.get('date') != None:
                     article_dirty_date_str = article.css(
                         selectors['date']).extract()
-
-                    p(article_dirty_date_str)
 
                     article_clean_date_str = get_clean_text(
                         article_dirty_date_str)
@@ -162,6 +167,7 @@ class MediaSpider(scrapy.Spider):
                     article_date = date_start
 
             p(f'ARTICLE DATE IS: {article_date}')
+
             if article_date.date() > date_end.date():
                 print(
                     f'article_date {article_date.date()} is BIGGER than date_end {date_end.date()}: skipping the item')
@@ -217,7 +223,9 @@ class MediaSpider(scrapy.Spider):
                 # ---TIME
                 if selectors.get('time') != None:
                     time_text = article.css(selectors['time']).extract()
+                    p(time_text)
                     time_parsed = get_clean_time(time_text)
+                    p(time_parsed)
                     article_loader.add_value('time', time_parsed)
 
                 # ---VIEWS
@@ -227,6 +235,8 @@ class MediaSpider(scrapy.Spider):
 
                     if media == "ukranews":
                         views = views_list[-1]
+
+                    views = get_clean_text(views_list)
                     # TODO extract to utility function get_views(media, dirty_value)
                     # it is supposed that media specific formatting is moved to media_config
                     if 'т' in views:
@@ -255,6 +265,11 @@ class MediaSpider(scrapy.Spider):
             else:
                 next_page_button_url = response.css(
                     selectors['next_page']).extract_first()
+                if 'http' in next_page_button_url:
+                    next_page_url = next_page_button_url
+                else:
+                    next_page_url = config.get(
+                        'url_prefix') + next_page_button_url
 
             if next_page_button_url == None:
                 return
@@ -312,36 +327,24 @@ class MediaSpider(scrapy.Spider):
             #         )
 
             # # eliminate spec case for liga
-            if media == 'liga':
-                if next_page_button_url != None and 'page' in next_page_button_url:
+            # if media == 'liga':
+            #     if next_page_button_url != None and 'page' in next_page_button_url:
 
-                    p('GOING TO THE NEXT PAGE')
-                    current_page_number = response.meta.get('page_number')
-                    next_page_url = get_media_url(
-                        media,
-                        date=date_end,
-                        page_number=current_page_number+1)
+            #         p('GOING TO THE NEXT PAGE')
+            #         current_page_number = response.meta.get('page_number')
+            #         next_page_url = get_media_url(
+            #             media,
+            #             date=date_end,
+            #             page_number=current_page_number+1)
 
-                    new_meta = response.meta.copy()
-                    new_meta['page_number'] = current_page_number + 1
+            #         new_meta = response.meta.copy()
+            #         new_meta['page_number'] = current_page_number + 1
 
-                    yield scrapy.Request(
-                        url=next_page_url,
-                        callback=self.parse_article_headers,
-                        meta=new_meta,
-                    )
-
-            # if next_page_button_url != None:
-            #     if 'http' in next_page_button_url:
-            #         next_page_url = next_page_button_url
-            #     else:
-            #         next_page_url = config.get(
-            #             'url_prefix') + next_page_button_url
-
-            # yield scrapy.Request(
-            #     url=next_page_url,
-            #     callback=self.parse_article_headers,
-            #     meta=response.meta.copy(),)
+            #         yield scrapy.Request(
+            #             url=next_page_url,
+            #             callback=self.parse_article_headers,
+            #             meta=new_meta,
+            #         )
 
     def parse_article_body(self, response):
         media = response.meta['media']
