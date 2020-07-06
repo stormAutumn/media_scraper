@@ -371,7 +371,7 @@ media_config = {
         'url_prefix': 'https://hromadske.ua',
         'url_template': 'https://hromadske.ua/news?page={page_number}',
         'selectors': {
-            'main_container': 'div.NewsPostList>a',
+            'main_container': '.NewsPostList > .NewsPublicationCard',
             'title': 'div.NewsPublicationCard-title::text',
             'link': '::attr(href)',
             'text': 'div.PostPreview-contentWrapper',

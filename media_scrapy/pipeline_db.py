@@ -1,6 +1,7 @@
 import psycopg2
-from datetime import datetime
+from datetime import datetime, timedelta
 from scrapy.exceptions import NotConfigured
+from media_config import media_config
 
 
 class DatabasePipeline(object):
@@ -40,7 +41,14 @@ class DatabasePipeline(object):
         date = item.get("date")[0]
         if "time" in item.keys():
             time = item.get("time")[0]
-            date_time = datetime.combine(date, time)
+            if domain == media_config['hromadske']['domain']:
+                # Громадське повертає дані з часом на 3 години менше ніж насправді
+                # При перегляді в браузері це можно помітити як splash невірних даних
+                # які коригуються в ту саму секунду
+                # Але це відбувається javascript'ом а скрапі його не виконує
+                date_time = datetime.combine(date, time) + timedelta(hours=3)
+            else:
+                date_time = datetime.combine(date, time)
         else:
             time = None
             date_time = date

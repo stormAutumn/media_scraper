@@ -154,6 +154,10 @@ def parse_date(media, date_response_format):
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B, %Y'], languages=['uk'])
 
+    if media == 'hromadske':
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%d %B'], languages=['uk'])
+
     return date_parsed
 
 

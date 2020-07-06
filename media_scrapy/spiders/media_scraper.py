@@ -9,7 +9,6 @@ from media_scrapy.items import MediaScraperItem
 from datetime import datetime
 import dateparser
 import psycopg2
-from bs4 import BeautifulSoup
 
 from media_config import media_config
 from utils import get_media_urls_for_period, get_media_url, get_clean_text, get_clean_time, parse_date
@@ -17,8 +16,8 @@ from utils import get_media_urls_for_period, get_media_url, get_clean_text, get_
 from scrapy.utils.project import get_project_settings
 
 
-def p(message):
-    print('=========================================')
+def p(message, title=''):
+    print(f'================{title}==================')
     print(message)
     print('=========================================')
 
@@ -55,17 +54,12 @@ class MediaSpider(scrapy.Spider):
 
         for media in media_config.keys():
             config = media_config[media]
-            selectors = config['selectors']
-            # if selectors.get('next_page_number') != 'only_page_number':
-            #     continue
-            if media != 'epravda':
+            if media != 'hromadske':
                 continue
 
-            date_start = datetime(2020, 2, 1)
-            date_end = datetime(2020, 5, 31)
+            date_start = datetime(2020, 7, 3)
+            date_end = datetime(2020, 7, 6)
 
-            ###########################################
-            # CHANGE!!!
             page_number = 1
 
             urls_dates = ()
@@ -100,9 +94,6 @@ class MediaSpider(scrapy.Spider):
                     page_number=page_number
                 )
 
-            p(urls_dates)
-            # return
-
             for url, date in zip(*urls_dates):
                 yield scrapy.Request(
                     url=url,
@@ -112,7 +103,10 @@ class MediaSpider(scrapy.Spider):
                         'date': date,
                         'date_end': date_end,
                         'page_number': page_number,
-                        'urls_to_skip': urls_to_skip
+                        'urls_to_skip': urls_to_skip,
+                        # для медія в яких у артиклів немає дати, а є тільки дата на сторінки, і то тільки на межі днів
+                        # наприклад https://hromadske.ua/news
+                        'current_date': datetime.now(),
                     }
                 )
 
@@ -124,44 +118,38 @@ class MediaSpider(scrapy.Spider):
         date_start = response.meta['date']
         date_end = response.meta['date_end']
 
+        # TODO rename main_container to article_item
         all_articles = response.css(selectors['main_container'])
 
         count = 0
+
+        # spec case for hromadske!!!! generalize!!
+        current_date = response.meta['current_date']
         for article in all_articles:
-            count += 1
-            if count > 30:
-                return
+            # count += 1
+            # if count > 2:
+            #     return
 
             # TODO треба винести поза цикл бо ця перевірка не залежить від article
             # СХОЖЕ що тут є проблема коли сторінка вміщує новини за 2 дні (межа днів):
             # в такому випадку новини попереднього дня будуть зберігатися як новини наступного
             # TODO перевырити після починки пагінатора
             if media == 'hromadske':  # or media == 'espreso':
-                date_header = response.css(
-                    selectors['date_header']).extract_first()
+                date_headers = response.css(selectors['date_header']).extract()
 
-                p(date_header)
+                article_date = current_date
+                if len(date_headers) > 0:
+                    date_header = date_headers[0]
+                    article_date = parse_date(media, date_header)
+                    current_date = article_date
 
-                if date_header != None:
-                    article_date = dateparser.parse(date_header, date_formats=[
-                        '%d %B'], languages=['uk'])
-                else:
-                    # має сенс тільки для hromadske але не зрозуміло яка дата тоді використовується
-                    # REVISIT
-                    continue
             else:
                 if selectors.get('date') != None:
                     article_dirty_date_str = article.css(
                         selectors['date']).extract()
-
                     article_clean_date_str = get_clean_text(
                         article_dirty_date_str)
-
-                    p(article_clean_date_str)
-
                     article_date = parse_date(media, article_clean_date_str)
-
-                    p(article_date)
 
                 else:
                     article_date = date_start
@@ -175,7 +163,7 @@ class MediaSpider(scrapy.Spider):
 
             if article_date.date() < date_start.date():
                 print(
-                    f'article_date {article_date.date()} is LESS than date_end {date_end.date()}: finishing')
+                    f'article_date {article_date.date()} is LESS than date_start {date_end.date()}: finishing')
                 return
 
             # ---------- COLLECT ALL ITEMS --------------
@@ -304,6 +292,7 @@ class MediaSpider(scrapy.Spider):
             new_meta = response.meta.copy()
 
             new_meta['page_number'] = current_page_number + 1
+            new_meta['current_date'] = current_date
 
             yield scrapy.Request(
                 url=next_page_url,
