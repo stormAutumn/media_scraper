@@ -231,13 +231,14 @@ media_config = {
         'start_request_type': 'pages_scraper',
         'domain': 'www.radiosvoboda.org',
         'url_prefix': 'https://www.radiosvoboda.org',
-        'url_template': 'https://www.radiosvoboda.org/z/630/{date}?p={page_number}',
+        'url_template': 'https://www.radiosvoboda.org/z/630/{date_end}?p={page_number}',
         'selectors': {
             'main_container': '.content-offset .row>ul>li',
             'title': 'div.media-block > a::attr(title)',
             'text': 'div.body-container',
             'link': 'div.media-block > a::attr(href)',
             'date': 'div.media-block span.date ::text',
+            'next_page': 'p.buttons.btn--load-more',
             'next_page_number': 'only_page_number'
         }
     },

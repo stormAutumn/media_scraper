@@ -71,7 +71,9 @@ def get_date(date, media):
 def get_media_url(media, date=None, date_end=None, page_number=None):
     '''Returns url ready for scraper applying date to url template of provided media'''
     media_url_template = media_config.get(media).get('url_template')
-    date_formatted = get_date(date, media)
+    date_formatted = None
+    if date != None:
+        date_formatted = get_date(date, media)
     date_end_formatted = None
     if date_end != None:
         date_end_formatted = get_date(date_end, media)
