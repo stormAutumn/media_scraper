@@ -92,7 +92,7 @@ media_config = {
         'selectors': {
             'main_container': 'ul.lenta > li.item-news',
             'title': 'a::text',
-            'text': 'article.material > div.header',
+            'text': 'article.material',
             'subtitle': '::text',
             'link': 'div.title > a::attr(href)',
             'date': 'time::attr(datetime)'
