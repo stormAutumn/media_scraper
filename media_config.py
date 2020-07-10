@@ -219,7 +219,7 @@ media_config = {
         'selectors': {
             'main_container': 'div#panel1>a',
             'title': 'span.tape_news__title::text',
-            'text': 'div.article_content',
+            'text': 'div.article',
             'link': '::attr(href)',
             'date': 'div.text > div.tape_news__info > span.tape_news__date::text',
             'views': 'div.text > div.tape_news__info > span.tape_news__date::text',
