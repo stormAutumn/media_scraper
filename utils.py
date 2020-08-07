@@ -1,9 +1,15 @@
-
+import platform
 import dateparser
 from datetime import datetime
 from datetime import timedelta
 from media_config import media_config
 import re
+
+
+if platform.system() == 'Windows':
+    no_zero_format = "%#"
+else:
+    no_zero_format = "%-"
 
 
 def get_date(date, media):
@@ -14,8 +20,8 @@ def get_date(date, media):
         year = date.strftime("%Y")
         return day + month + year
     if media == 'svoboda' or media == 'LB':
-        day = date.strftime("%#d")
-        month = date.strftime("%#m")
+        day = date.strftime(no_zero_format + "d")
+        month = date.strftime(no_zero_format + "m")
         year = date.strftime("%Y")
         return year + '/' + month + '/' + day
     if media == 'obozrevatel':
@@ -39,23 +45,23 @@ def get_date(date, media):
         year = date.strftime("%Y")
         return year + month + day
     if media == 'strana':
-        day = date.strftime("%#d")
-        month = date.strftime("%#m")
+        day = date.strftime(no_zero_format + "d")
+        month = date.strftime(no_zero_format + "m")
         year = date.strftime("%Y")
         return year + '-' + month + '-' + day
     if media == 'segodnya':
-        day = date.strftime("%#d")
-        month = date.strftime("%#m")
+        day = date.strftime(no_zero_format + "d")
+        month = date.strftime(no_zero_format + "m")
         year = date.strftime("%Y")
         return year + '-' + month + '/' + year + '-' + month + '-' + day
     if media == '24tv':
-        day = date.strftime("%#d")
+        day = date.strftime(no_zero_format + "d")
         month = date.strftime("%B").lower()
         year = date.strftime("%Y")
         return day + '_' + month + '_' + year
     if media == 'gordonua':
-        day = date.strftime("%#d")
-        month = date.strftime("%#m")
+        day = date.strftime(no_zero_format + "d")
+        month = date.strftime(no_zero_format + "m")
         year = date.strftime("%Y")
         return day + '-' + month + '-' + year
     if media == 'ukranews' or media == 'interfax':
