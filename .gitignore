@@ -1,3 +1,4 @@
 ./result
 ./__pycache__
 ./media_scrapy/__pycache__
+local_settings.py
