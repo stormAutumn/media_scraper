@@ -66,6 +66,11 @@ def get_date(date, media):
         day = date.strftime("%d")
         month = date.strftime("%m")
         return day + '.' + month
+    if media == 'korrespondent':
+        year = date.strftime("%Y")
+        month = date.strftime("%B").lower()
+        return year + '/' + month
+
 
 
 def get_media_url(media, date=None, date_end=None, page_number=None):
@@ -95,7 +100,11 @@ def get_media_urls_for_period(media, date_start=None, date_end=None, page_number
             url = get_media_url(media, current_date, date_end, page_number)
             urls.append(url)
             current_dates.append(current_date)
-            current_date += timedelta(days=1)
+            # korrespondent shows news by month, so next date will be the first day of next month
+            if media=='korrespondent':
+                current_date = (current_date.replace(day=1) + timedelta(days=32)).replace(day=1)
+            else:
+                current_date += timedelta(days=1)
     else:
         url = get_media_url(media, current_date, page_number)
         urls.append(url)
@@ -159,6 +168,10 @@ def parse_date(media, date_response_format):
     if media == 'hromadske':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B'], languages=['uk'])
+
+    if media == 'korrespondent':
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%d %B %Y, %H:%M'], languages=['uk'])
 
     return date_parsed
 

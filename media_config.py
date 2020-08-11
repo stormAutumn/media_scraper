@@ -416,5 +416,21 @@ media_config = {
             'next_page': 'div.news_paging:nth-child(1)  a.pag_next::attr(href)',
             'next_page_number': 'only_page_number'
         }
+    },
+    'korrespondent': {
+        'start_request_type': 'media_scraper',
+        'domain': 'https://ua.korrespondent.net/',
+        'url_prefix': '',
+        'url_template': 'https://ua.korrespondent.net/all/{date}/p{page_number}/',
+        'selectors': {
+            'main_container': 'div.articles-list div.article.article_rubric_top',
+            'title': 'h3 > a::text',
+            'subtitle': 'div.article__text::text',
+            'link': 'h3 > a::attr(href)',
+            'text': 'div.post-item__text',
+            'date': 'div.article__date::text',
+            # 'views': 'div.post-item__views span::text',
+            'next_page': 'li.pagination__item_last.pagination__item > a.pagination__link.pagination__forward::attr(href)'
+        }
     }
 }
