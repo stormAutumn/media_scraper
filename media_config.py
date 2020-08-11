@@ -188,14 +188,14 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'www.unn.com.ua',
         'url_prefix': 'https://www.unn.com.ua',
-        'url_template': 'https://www.unn.com.ua/uk/news/{date}',
+        'url_template': 'https://www.unn.com.ua/uk/news/{date}/page-{page_number}',
         'selectors': {
             'main_container': 'div.h-news-feed > ul > li',
             'title': 'p.title > a::text',
             'text': 'div.b-news-holder',
             'link': 'p.title > a::attr(href)',
             'time': 'span.date::text',
-            'next_page': 'div.b-page-selector-holder > ul >li.page_nav.next_page > a::attr(href)'
+            'next_page': 'div.b-page-selector-holder > ul >li.page_nav.next_page:not([class~=ina]) > a::attr(href)'
         }
     },
     'focus': {
@@ -347,7 +347,7 @@ media_config = {
             'link': 'div.col-57 > h1.article-link-wrapper > a::attr(href)',
             'text': 'div.grid.content > div.col-23 div.article-content',
             'date': 'div.article-image-wrapper .article-time *::text',
-            'next_page': 'div.pager > a:nth-child(2)::attr(href)',
+            'next_page': 'div.pager > a:last-child::attr(href)',
             'next_page_number': 'only_page_number'
         }
     },
@@ -366,6 +366,7 @@ media_config = {
             'next_page': 'ul.pages > li.link.center.active + li > a::attr(href)'
         }
     },
+    # sraped correctly only when in 10-days intervals
     'hromadske': {
         'start_request_type': 'pages_scraper',
         'domain': 'https://hromadske.ua/',

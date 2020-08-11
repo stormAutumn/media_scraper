@@ -38,7 +38,7 @@ class MediaSpider(scrapy.Spider):
                                 password=db_settings['passwd'],
                                 host=db_settings['host'])
         cursor = conn.cursor()
-        # TODO має залежити від списку ЗМІ що обробляється
+        # не має залежити від списку ЗМІ що обробляється через перехресні посилання як у УП та ЄП
         sql_query = 'SELECT link FROM news_items'
         cursor.execute(sql_query)
         fetched_records = cursor.fetchall()
@@ -54,11 +54,12 @@ class MediaSpider(scrapy.Spider):
 
         for media in media_config.keys():
             config = media_config[media]
-            if media != 'epravda':
+
+            if media != 'hromadske':
                 continue
 
-            date_start = datetime(2020, 3, 1)
-            date_end = datetime(2020, 3, 31)
+            date_start = datetime(2020, 7, 1)
+            date_end = datetime(2020, 7, 10)
 
             page_number = 1
 
@@ -221,14 +222,14 @@ class MediaSpider(scrapy.Spider):
 
                     if media == "ukranews":
                         views = views_list[-1]
-
-                    views = get_clean_text(views_list)
-                    # TODO extract to utility function get_views(media, dirty_value)
-                    # it is supposed that media specific formatting is moved to media_config
-                    if 'т' in views:
-                        if '.' in views:
-                            views = views.replace('.', '')
-                        views = views.replace('т', '000')
+                    else:
+                        views = get_clean_text(views_list)
+                        # TODO extract to utility function get_views(media, dirty_value)
+                        # it is supposed that media specific formatting is moved to media_config
+                        if 'т' in views:
+                            if '.' in views:
+                                views = views.replace('.', '')
+                            views = views.replace('т', '000')
                     article_loader.add_value('views', views)
 
                 yield scrapy.Request(
@@ -257,8 +258,8 @@ class MediaSpider(scrapy.Spider):
                     next_page_url = config.get(
                         'url_prefix') + next_page_button_url
 
-            # if next_page_button_url == None:
-            #     return
+            if next_page_button_url == None or next_page_button_url == 'javascript:;':
+                return
 
             p(f"NEXT BUTTON URL: {next_page_button_url}")
 
@@ -287,6 +288,12 @@ class MediaSpider(scrapy.Spider):
         media = response.meta['media']
         selectors = media_config[media]['selectors']
         text = response.css(selectors['text']).extract_first()
+
+        # text може бути None, коли у стрічці новин посилання на підсайти з іншою версткою (типу лайфстайл, спорт, і т.д.)
+        # або коли новина складається тільки з відео
+        if text == None:
+            p("SKIP BECAUSE TEXT IS NONE")
+            return
 
         article_loader = response.meta['article_loader']
 
