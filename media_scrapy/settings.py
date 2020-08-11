@@ -9,6 +9,7 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+
 BOT_NAME = 'media_scraper'
 
 SPIDER_MODULES = ['media_scrapy.spiders']
@@ -115,12 +116,19 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# default DB settings
 DB_SETTINGS = {
     'db': 'media_ecosystem',
     'user': 'postgres',
     'passwd': 'postgres',
     'host': 'localhost'
 }
+
+try:
+    from local_settings import *
+except ImportError:
+    print('Used default DB settings')
 
 # SPLASH_URL = 'http://192.168.59.103:8050'
 
