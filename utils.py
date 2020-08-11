@@ -3,6 +3,7 @@ import dateparser
 from datetime import datetime
 from datetime import timedelta
 from media_config import media_config
+import re
 
 
 def get_date(date, media):
@@ -156,8 +157,10 @@ def parse_date(media, date_response_format):
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
     if media == 'censor' or media == 'tsn':
+        # get rid of +02:00 or +03:00
+        date_response_format = re.sub(r'\+0\d\:00', '', date_response_format)
         date_parsed = dateparser.parse(date_response_format, date_formats=[
-            '%Y-%m-%dT%H:%M:%S+03:00'], languages=['uk'])
+            '%Y-%m-%dT%H:%M:%S'], languages=['uk'])
     if media == 'liga':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y %H:%M'], languages=['uk'])
