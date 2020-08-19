@@ -55,11 +55,11 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-            if media != 'hromadske':
+            if media != 'glavcom':
                 continue
 
-            date_start = datetime(2020, 7, 1)
-            date_end = datetime(2020, 7, 10)
+            date_start = datetime(2020, 2, 1)
+            date_end = datetime(2020, 6, 30)
 
             page_number = 1
 
@@ -153,7 +153,12 @@ class MediaSpider(scrapy.Spider):
                 else:
                     article_date = date_start
 
+
             p(f'ARTICLE DATE IS: {article_date}')
+
+            if not article_date:
+                print('article_date is None: skipping the item')
+                continue
 
             if article_date.date() > date_end.date():
                 print(
