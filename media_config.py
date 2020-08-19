@@ -432,5 +432,19 @@ media_config = {
             # 'views': 'div.post-item__views span::text',
             'next_page': 'li.pagination__item_last.pagination__item > a.pagination__link.pagination__forward::attr(href)'
         }
+    },
+    'glavcom': {
+        'start_request_type': 'media_scraper',
+        'domain': 'glavcom.ua',
+        'url_prefix': 'https://glavcom.ua',
+        'url_template': 'https://glavcom.ua/news/archive/{date}.html',
+        'selectors': {
+            'main_container': 'div.block.news_list > ul > li',
+            'title': 'time + a::text',
+            'subtitle': 'div.header::text',
+            'text': 'div.body',
+            'link': 'time + a::attr(href)',
+            'date': 'time::text'
+        }
     }
 }

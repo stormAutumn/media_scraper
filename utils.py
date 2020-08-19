@@ -24,7 +24,7 @@ def get_date(date, media):
         month = date.strftime(no_zero_format + "m")
         year = date.strftime("%Y")
         return year + '/' + month + '/' + day
-    if media == 'obozrevatel':
+    if media == 'obozrevatel' or media=='glavcom':
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
@@ -126,7 +126,7 @@ def parse_date(media, date_response_format):
     if media == 'znaj':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%H:%M %d.%m'], languages=['uk'])
-    if media == '24tv':
+    if media == '24tv' or media=='glavcom':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B, %H:%M'], languages=['uk'])
     if media == 'gordonua':
