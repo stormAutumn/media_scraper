@@ -446,5 +446,18 @@ media_config = {
             'link': 'time + a::attr(href)',
             'date': 'time::text'
         }
+    },
+    'vgolos': {
+        'start_request_type': 'media_scraper',
+        'domain': 'vgolos.com.ua',
+        'url_template': 'https://vgolos.com.ua/date/{date}/page/{page_number}',
+        'selectors': {
+            'main_container': 'div.articles-list.posts-list > div.article-item',
+            'title': 'div.item-title > a::text',
+            'text': 'div.text',
+            'link': 'div.item-title > a::attr(href)',
+            'date': 'div.item-meta > span.item-date::text',
+            'next_page': 'button.elm-button::attr(data-href)'
+        }
     }
 }

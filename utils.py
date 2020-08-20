@@ -29,7 +29,7 @@ def get_date(date, media):
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return day + '-' + month + '-' + year
-    if media == 'rbc' or media == 'tsn' or media == 'unn' or media == 'focus':
+    if media == 'rbc' or media == 'tsn' or media == 'unn' or media == 'focus' or media=='vgolos':
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
@@ -150,7 +150,7 @@ def parse_date(media, date_response_format):
     if media == 'znaj':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%H:%M, %d.%m'], languages=['uk'])
-    if media == '112':
+    if media == '112' or media=='vgolos':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
     if media == 'svoboda':
