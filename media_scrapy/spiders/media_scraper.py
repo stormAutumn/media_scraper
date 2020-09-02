@@ -55,11 +55,12 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-            if media != 'glavcom':
+
+            if media != 'vgolos':
                 continue
 
             date_start = datetime(2020, 2, 1)
-            date_end = datetime(2020, 6, 30)
+            date_end = datetime(2020, 3, 31)
 
             page_number = 1
 
