@@ -264,12 +264,12 @@ media_config = {
         'url_prefix': 'https://zn.ua',
         'url_template': 'https://zn.ua/ukr/all-news/date={date}',
         'selectors': {
-            'main_container': 'ul.news_list > li > a',
-            'title': 'span.news_anounce > span.news_title::text',
-            'subtitle': 'span.news_anounce > span.news_summary::text',
+            'main_container': 'div.news_list.news_block > div.news_block_item',
+            'title': 'a.news_item.sunsite_action::text',
+            'subtitle': 'span.news_summary::text',
             'link': 'a::attr(href)',
-            'text': 'div.article_body div.article_body',
-            'time': 'span.news_date::text',
+            'text': 'div.bottom_block div.article_body',
+            'time': 'div.news_block_item::attr(data-type)',
             'next_page': 'div.navigate > span.next>a::attr(href)',
             'next_page_number': 'page_and_date'
         }

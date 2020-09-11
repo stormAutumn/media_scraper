@@ -55,7 +55,6 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-
             if media != 'vgolos':
                 continue
 
@@ -153,7 +152,6 @@ class MediaSpider(scrapy.Spider):
 
                 else:
                     article_date = date_start
-
 
             p(f'ARTICLE DATE IS: {article_date}')
 
@@ -271,12 +269,12 @@ class MediaSpider(scrapy.Spider):
 
             current_page_number = response.meta.get('page_number')
 
-            next_page_url = get_media_url(
-                media,
-                date=date_start,
-                date_end=date_end,
-                page_number=current_page_number+1
-            )
+            # next_page_url = get_media_url(
+            #     media,
+            #     date=date_start,
+            #     date_end=date_end,
+            #     page_number=current_page_number+1
+            # )
 
             p(f"next_page_url: {next_page_url}")
             new_meta = response.meta.copy()
