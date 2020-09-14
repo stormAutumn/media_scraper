@@ -35,13 +35,13 @@ media_config = {
         'url_prefix': '',
         'url_template': 'https://www.obozrevatel.com/ukr/main-item/{date}.htm',
         'selectors': {
-            'main_container': 'div.section-news-title-img-text__wrap>article.news-title-img-text',
-            'title': 'div.news-title-img-text__content>a.news-title-img-text__title::text',
-            'text': 'div.main-col__left div.news-full__text.io-article-body',
-            'subtitle': 'div.news-title-img-text__content>a.news-title-img-text__text::text',
-            'link': 'div.news-title-img-text__content>a::attr(href)',
-            'time': 'div.news-title-img-text__wrap-icon>time.news-title-img-text__date::text',
-            'views': 'div.news-title-img-text__wrap-icon>span.icon-views::text'
+            'main_container': 'article.news',
+            'title': 'h3.news_title>a::text',
+            'text': 'div.newsFull_text',
+            'subtitle': 'article.news>p.news_descr>a::text',
+            'link': 'a::attr(href)',
+            'date': 'div.news_footer>time.time::attr(datetime)',
+            'views': 'footer.reaction>div.reaction_item:first-child>span.reaction_value::text'
         }
     },
     'rbc': {

@@ -55,11 +55,11 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-            if media != 'vgolos':
+            if media != '112':
                 continue
 
-            date_start = datetime(2020, 2, 1)
-            date_end = datetime(2020, 3, 31)
+            date_start = datetime(2020, 8, 1)
+            date_end = datetime(2020, 8, 31)
 
             page_number = 1
 
@@ -146,9 +146,12 @@ class MediaSpider(scrapy.Spider):
                 if selectors.get('date') != None:
                     article_dirty_date_str = article.css(
                         selectors['date']).extract()
+                    p(article_dirty_date_str)
                     article_clean_date_str = get_clean_text(
                         article_dirty_date_str)
                     article_date = parse_date(media, article_clean_date_str)
+                    p('!!!!!!!!!!!!!!!!!!!!HERE')
+                    p(article_date)
 
                 else:
                     article_date = date_start
@@ -231,9 +234,14 @@ class MediaSpider(scrapy.Spider):
                         # TODO extract to utility function get_views(media, dirty_value)
                         # it is supposed that media specific formatting is moved to media_config
                         if 'т' in views:
+                            views = views.replace(' ', '')
                             if '.' in views:
                                 views = views.replace('.', '')
-                            views = views.replace('т', '000')
+                                views = views.replace('т', '00')
+                            if ',' in views:
+                                views = views.replace(',', '')
+                            views = views.replace('т', '00')
+
                     article_loader.add_value('views', views)
 
                 yield scrapy.Request(

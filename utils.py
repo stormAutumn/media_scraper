@@ -24,12 +24,12 @@ def get_date(date, media):
         month = date.strftime(no_zero_format + "m")
         year = date.strftime("%Y")
         return year + '/' + month + '/' + day
-    if media == 'obozrevatel' or media=='glavcom':
+    if media == 'obozrevatel' or media == 'glavcom':
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return day + '-' + month + '-' + year
-    if media == 'rbc' or media == 'tsn' or media == 'unn' or media == 'focus' or media=='vgolos':
+    if media == 'rbc' or media == 'tsn' or media == 'unn' or media == 'focus' or media == 'vgolos':
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
@@ -79,7 +79,6 @@ def get_date(date, media):
         return year + '/' + month
 
 
-
 def get_media_url(media, date=None, date_end=None, page_number=None):
     '''Returns url ready for scraper applying date to url template of provided media'''
     media_url_template = media_config.get(media).get('url_template')
@@ -108,8 +107,9 @@ def get_media_urls_for_period(media, date_start=None, date_end=None, page_number
             urls.append(url)
             current_dates.append(current_date)
             # korrespondent shows news by month, so next date will be the first day of next month
-            if media=='korrespondent':
-                current_date = (current_date.replace(day=1) + timedelta(days=32)).replace(day=1)
+            if media == 'korrespondent':
+                current_date = (current_date.replace(day=1) +
+                                timedelta(days=32)).replace(day=1)
             else:
                 current_date += timedelta(days=1)
     else:
@@ -126,7 +126,7 @@ def parse_date(media, date_response_format):
     if media == 'znaj':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%H:%M %d.%m'], languages=['uk'])
-    if media == '24tv' or media=='glavcom':
+    if media == '24tv' or media == 'glavcom':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B, %H:%M'], languages=['uk'])
     if media == 'gordonua':
@@ -150,7 +150,7 @@ def parse_date(media, date_response_format):
     if media == 'znaj':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%H:%M, %d.%m'], languages=['uk'])
-    if media == '112' or media=='vgolos':
+    if media == '112' or media == 'vgolos':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
     if media == 'svoboda':
@@ -182,6 +182,9 @@ def parse_date(media, date_response_format):
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y, %H:%M'], languages=['uk'])
 
+    if media == 'obozrevatel':
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%Y-%m-%dT%H:%M:%S'], languages=['uk'])
     return date_parsed
 
 
