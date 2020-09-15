@@ -55,11 +55,11 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-            if media != '112':
+            if media != 'nv':
                 continue
 
-            date_start = datetime(2020, 8, 1)
-            date_end = datetime(2020, 8, 31)
+            date_start = datetime(2020, 2, 1)
+            date_end = datetime(2020, 3, 31)
 
             page_number = 1
 

@@ -459,5 +459,16 @@ media_config = {
             'date': 'div.item-meta > span.item-date::text',
             'next_page': 'button.elm-button::attr(data-href)'
         }
+    },
+    'nv': {
+        'start_request_type': 'media_scraper',
+        'domain': 'nv.ua',
+        'url_template': 'https://nv.ua/sitemap_{date}.html',
+        'selectors': {
+            'main_container': 'div.row > div.col-xs-12 ~ p',
+            'title': 'a::text',
+            'text': 'div.article__content__body',
+            'link': 'a::attr(href)'
+        }
     }
 }
