@@ -77,11 +77,11 @@ media_config = {
         'url_prefix': '',
         'url_template': 'https://www.unian.ua/news/archive/{date}',
         'selectors': {
-            'main_container': 'div.col-md-8.pl0.col-sm-12.sm-prl0>div.publications-archive>div.gallery-item',
-            'title': 'div.gallery-item.news-inline-item>a::text',
+            'main_container': 'div.col-md-8.pl0.col-sm-12.sm-prl0>div.list-thumbs__item>div.list-thumbs__info',
+            'title': 'a.list-thumbs__title::text',
             'text': 'div.article-text',
-            'link': 'div.gallery-item.news-inline-item>a::attr(href)',
-            'date': 'div.gallery-item.news-inline-item>div.bottom>div.left>div.item.time::text'
+            'link': 'a.list-thumbs__title::attr(href)',
+            'date': 'div.list-thumbs__time.time::text'
         }
     },
     'LB': {
@@ -147,12 +147,12 @@ media_config = {
         'url_prefix': '',
         'url_template': 'https://tsn.ua/archive/{date}',
         'selectors': {
-            'main_container': 'article.h-entry.c-entry',
-            'title': 'h4 > a::text',
-            'text': 'div.c-main',
-            'link': 'h4 > a::attr(href)',
-            'subtitle': 'p > a::text',
-            'date': 'div.c-post-info > time::attr(datetime)',
+            'main_container': 'article.c-card.c-card--title-md.c-card--log',
+            'title': 'h3.c-card__title > a::text',
+            'text': 'div.e-content',
+            'link': 'h3.c-card__title > a::attr(href)',
+            'subtitle': 'div.c-card__lead > p::text',
+            'date': 'footer.c-card__foot > time::attr(datetime)',
             # 'next_page': 'div.text-center > div.js-more::attr(data-source)',
         }
     },
@@ -204,7 +204,7 @@ media_config = {
         'url_prefix': 'https://focus.ua',
         'url_template': 'https://focus.ua/news/{date}',
         'selectors': {
-            'main_container': 'ol.uk-list > li',
+            'main_container': 'ol.uk-list.yo-list-archive > li',
             'title': 'div.uk-link-heading::text',
             'text': 'section.pub-body',
             'link': 'article.uk-position-relative > a.uk-link-toggle::attr(href)',
