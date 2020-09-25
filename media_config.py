@@ -247,7 +247,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': '112.ua',
         'url_prefix': 'https://ua.112.ua',
-        'url_template': 'https://ua.112.ua/archive/p2?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
+        'url_template': 'https://ua.112.ua/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
         'selectors': {
             'main_container': 'div.decs-list',
             'title': 'a::text',
@@ -278,7 +278,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'strana.ua',
         'url_prefix': 'https://strana.ua',
-        'url_template': 'https://strana.ua/archive/day={date}/page-{page_number}.html',
+        'url_template': 'https://strana.ua/news/day={date}/page-{page_number}.html',
         'selectors': {
             'main_container': 'article.lenta-news.clearfix',
             'title': 'div > div.title > a::text',
@@ -394,7 +394,7 @@ media_config = {
             'link': 'a::attr(href)',
             'time': 'div.time::text',
             'text': 'div.article',
-            'next_page': 'div.b_center_pager>ul.pager_list>li.arrow',
+            'next_page': 'div.b_center_pager>ul.pager_list li.page+li.arrow',
             'next_page_number': 'only_page_number',
             'date_header': 'div.news-list.big.time-stamp > h2::text'
         }
