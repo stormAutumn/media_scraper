@@ -238,7 +238,7 @@ media_config = {
             'text': 'div.body-container',
             'link': 'div.media-block > a::attr(href)',
             'date': 'div.media-block span.date ::text',
-            'next_page': 'p.buttons.btn--load-more',
+            'next_page': 'p.buttons.btn--load-more > a::attr(href)',
             'next_page_number': 'only_page_number'
         }
     },
