@@ -77,11 +77,11 @@ media_config = {
         'url_prefix': '',
         'url_template': 'https://www.unian.ua/news/archive/{date}',
         'selectors': {
-            'main_container': 'div.col-md-8.pl0.col-sm-12.sm-prl0>div.publications-archive>div.gallery-item',
-            'title': 'div.gallery-item.news-inline-item>a::text',
+            'main_container': 'div.col-md-8.pl0.col-sm-12.sm-prl0>div.list-thumbs__item>div.list-thumbs__info',
+            'title': 'a.list-thumbs__title::text',
             'text': 'div.article-text',
-            'link': 'div.gallery-item.news-inline-item>a::attr(href)',
-            'date': 'div.gallery-item.news-inline-item>div.bottom>div.left>div.item.time::text'
+            'link': 'a.list-thumbs__title::attr(href)',
+            'date': 'div.list-thumbs__time.time::text'
         }
     },
     'LB': {
@@ -147,12 +147,12 @@ media_config = {
         'url_prefix': '',
         'url_template': 'https://tsn.ua/archive/{date}',
         'selectors': {
-            'main_container': 'article.h-entry.c-entry',
-            'title': 'h4 > a::text',
-            'text': 'div.c-main',
-            'link': 'h4 > a::attr(href)',
-            'subtitle': 'p > a::text',
-            'date': 'div.c-post-info > time::attr(datetime)',
+            'main_container': 'article.c-card.c-card--title-md.c-card--log',
+            'title': 'h3.c-card__title > a::text',
+            'text': 'div.e-content',
+            'link': 'h3.c-card__title > a::attr(href)',
+            'subtitle': 'div.c-card__lead > p::text',
+            'date': 'footer.c-card__foot > time::attr(datetime)',
             # 'next_page': 'div.text-center > div.js-more::attr(data-source)',
         }
     },
@@ -204,7 +204,7 @@ media_config = {
         'url_prefix': 'https://focus.ua',
         'url_template': 'https://focus.ua/news/{date}',
         'selectors': {
-            'main_container': 'ol.uk-list > li',
+            'main_container': 'ol.uk-list.yo-list-archive > li',
             'title': 'div.uk-link-heading::text',
             'text': 'section.pub-body',
             'link': 'article.uk-position-relative > a.uk-link-toggle::attr(href)',
@@ -247,7 +247,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': '112.ua',
         'url_prefix': 'https://ua.112.ua',
-        'url_template': 'https://ua.112.ua/archive/p2?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
+        'url_template': 'https://ua.112.ua/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
         'selectors': {
             'main_container': 'div.decs-list',
             'title': 'a::text',
@@ -278,7 +278,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'strana.ua',
         'url_prefix': 'https://strana.ua',
-        'url_template': 'https://strana.ua/archive/day={date}/page-{page_number}.html',
+        'url_template': 'https://strana.ua/news/day={date}/page-{page_number}.html',
         'selectors': {
             'main_container': 'article.lenta-news.clearfix',
             'title': 'div > div.title > a::text',
@@ -394,7 +394,7 @@ media_config = {
             'link': 'a::attr(href)',
             'time': 'div.time::text',
             'text': 'div.article',
-            'next_page': 'div.b_center_pager>ul.pager_list>li.arrow',
+            'next_page': 'div.b_center_pager>ul.pager_list li.page+li.arrow',
             'next_page_number': 'only_page_number',
             'date_header': 'div.news-list.big.time-stamp > h2::text'
         }
@@ -458,6 +458,17 @@ media_config = {
             'link': 'div.item-title > a::attr(href)',
             'date': 'div.item-meta > span.item-date::text',
             'next_page': 'button.elm-button::attr(data-href)'
+        }
+    },
+    'nv': {
+        'start_request_type': 'media_scraper',
+        'domain': 'nv.ua',
+        'url_template': 'https://nv.ua/sitemap_{date}.html',
+        'selectors': {
+            'main_container': 'div.row > div.col-xs-12 ~ p',
+            'title': 'a::text',
+            'text': 'div.article__content__body',
+            'link': 'a::attr(href)'
         }
     }
 }

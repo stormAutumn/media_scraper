@@ -55,7 +55,7 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-            if media != '112':
+            if media != 'espreso':
                 continue
 
             date_start = datetime(2020, 8, 1)
@@ -255,23 +255,21 @@ class MediaSpider(scrapy.Spider):
 
         # після перебору всіх артиклів перевіряємо чи потрібно йти на наступну сторінку
         # TODO схоже принаймні для еспресо (знайти виключення!!) можна просто брати href з кнопки
-        if selectors.get('next_page') != None:
-            # TODO схоже що можно позбутися спец кейсу якщо завжди брати ОСТАННІЙ елемент next_page
-            if media == 'espreso':
-                last_next_page_btn = response.css(
-                    selectors['next_page'])[-1]
-                next_page_button_url = last_next_page_btn.extract()
-            else:
-                next_page_button_url = response.css(
-                    selectors['next_page']).extract_first()
-                if 'http' in next_page_button_url:
-                    next_page_url = next_page_button_url
-                else:
-                    next_page_url = config.get(
-                        'url_prefix') + next_page_button_url
+        if selectors.get('next_page') != None:       
+        
+            next_page_button_url = response.css(
+                selectors['next_page']).extract_first()
 
             if next_page_button_url == None or next_page_button_url == 'javascript:;':
                 return
+
+            if 'http' in next_page_button_url:
+                next_page_url = next_page_button_url
+            else:
+                next_page_url = config.get(
+                    'url_prefix') + next_page_button_url
+
+            
 
             p(f"NEXT BUTTON URL: {next_page_button_url}")
 

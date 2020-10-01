@@ -34,7 +34,7 @@ def get_date(date, media):
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return year + '/' + month + '/' + day
-    if media == '112' or media == 'liga' or media == 'zik'or media == 'dzerkalo_tyzhnya' or media == 'apostrophe':
+    if media == '112' or media == 'liga' or media == 'zik'or media == 'dzerkalo_tyzhnya' or media == 'apostrophe' or media == 'nv':
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
