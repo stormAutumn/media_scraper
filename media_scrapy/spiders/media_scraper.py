@@ -9,9 +9,11 @@ from media_scrapy.items import MediaScraperItem
 from datetime import datetime
 import dateparser
 import psycopg2
+import json
 
 from media_config import media_config
-from utils import get_media_urls_for_period, get_media_url, get_clean_text, get_clean_time, parse_date
+from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
+                    get_clean_time, parse_date, parse_date_from_article_page
 
 from scrapy.utils.project import get_project_settings
 
@@ -109,6 +111,7 @@ class MediaSpider(scrapy.Spider):
                     }
                 )
 
+
     def parse_article_headers(self, response):
         media = response.meta['media']
         config = media_config[media]
@@ -117,23 +120,40 @@ class MediaSpider(scrapy.Spider):
         date_start = response.meta['date']
         date_end = response.meta['date_end']
 
-        # TODO rename main_container to article_item
-        all_articles = response.css(selectors['main_container'])
-
-        count = 0
-
-        # spec case for hromadske!!!! generalize!!
         current_date = response.meta['current_date']
-        for article in all_articles:
-            # count += 1
-            # if count > 2:
-            #     return
 
-            # TODO треба винести поза цикл бо ця перевірка не залежить від article
+        # Зараз цей випадок тільки для Обозревателя
+        # але якщо ще будуть такі медіа, то можна змінити їх тип на якийсь json_scraper
+        if media == 'obozrevatel':
+            all_articles = json.loads(response.text)[selectors.get('main_container')]
+            if not all_articles:
+                print(f'Parsed all pages for {date_start}: finishing')
+                return 
+                
+            for article_loader, article_url in self.parse_json_result(all_articles, selectors, config, media, response.meta['urls_to_skip']):
+                if article_url:
+                    yield scrapy.Request(
+                            url=article_url,
+                            callback=self.parse_article_body,
+                            meta={
+                                'media': media,
+                                'article_loader': article_loader
+                            }
+                        )
+
+        else:
+        # TODO rename main_container to article_item
+            all_articles = response.css(selectors['main_container'])         
+
+            # if media has no date selector - all articles on page have same date
+            if not selectors.get('date'):
+                article_date = date_start
+
+            # spec case for hromadske and espreso!!!! generalize!!
             # СХОЖЕ що тут є проблема коли сторінка вміщує новини за 2 дні (межа днів):
             # в такому випадку новини попереднього дня будуть зберігатися як новини наступного
             # TODO перевырити після починки пагінатора
-            if media == 'hromadske':  # or media == 'espreso':
+            if selectors.get('date_header') != None:
                 date_headers = response.css(selectors['date_header']).extract()
 
                 article_date = current_date
@@ -142,7 +162,12 @@ class MediaSpider(scrapy.Spider):
                     article_date = parse_date(media, date_header)
                     current_date = article_date
 
-            else:
+            
+            for article in all_articles:
+                # count += 1
+                # if count > 2:
+                #     return
+               
                 if selectors.get('date') != None:
                     article_dirty_date_str = article.css(
                         selectors['date']).extract()
@@ -153,134 +178,136 @@ class MediaSpider(scrapy.Spider):
                     p('!!!!!!!!!!!!!!!!!!!!HERE')
                     p(article_date)
 
-                else:
-                    article_date = date_start
 
-            p(f'ARTICLE DATE IS: {article_date}')
+                p(f'ARTICLE DATE IS: {article_date}')
 
-            if not article_date:
-                print('article_date is None: skipping the item')
-                continue
-
-            if article_date.date() > date_end.date():
-                print(
-                    f'article_date {article_date.date()} is BIGGER than date_end {date_end.date()}: skipping the item')
-                continue
-
-            if article_date.date() < date_start.date():
-                print(
-                    f'article_date {article_date.date()} is LESS than date_start {date_end.date()}: finishing')
-                return
-
-            # ---------- COLLECT ALL ITEMS --------------
-            if date_start.date() <= article_date.date() <= date_end.date():
-                print(
-                    f'article_date {article_date.date()} is in range [{date_start.date()}, {date_end.date()}]')
-
-                # ---LINK
-                article_href = article.css(selectors['link']).extract_first()
-                if 'http' in article_href:
-                    article_url = article_href
-                else:
-                    article_url = config.get('url_prefix') + article_href
-
-                # ---check whether this link`s been already parsed
-                if article_url in response.meta['urls_to_skip']:
-                    p('ALREADY IN DB')
+                if not article_date:
+                    print('article_date is None: skipping the item')
                     continue
 
-                article_loader = ItemLoader(
-                    item=MediaScraperItem(),
-                    selector=article
-                )
-                article_loader.add_value('link', article_url)
-                # ---DATE
-                article_loader.add_value('date', article_date)
+                if article_date.date() > date_end.date():
+                    print(
+                        f'article_date {article_date.date()} is BIGGER than date_end {date_end.date()}: skipping the item')
+                    continue
 
-                # ---DOMAIN
-                article_loader.add_value(
-                    'domain', config.get('domain'))
+                if article_date.date() < date_start.date():
+                    print(
+                        f'article_date {article_date.date()} is LESS than date_start {date_start.date()}: finishing')
+                    return
 
-                # ---TITLE
-                title_text_dirty_list = article.css(
-                    selectors['title']).extract()
-                title_clean = get_clean_text(title_text_dirty_list)
-                article_loader.add_value('title', title_clean)
+                # ---------- COLLECT ALL ITEMS --------------
+                if date_start.date() <= article_date.date() <= date_end.date():
+                    print(
+                        f'article_date {article_date.date()} is in range [{date_start.date()}, {date_end.date()}]')
 
-                # ---SUBTITLE
-                if selectors.get('subtitle') != None:
-                    subtitle_text_list = article.css(
-                        selectors['subtitle']).extract()
-                    subtitle = get_clean_text(subtitle_text_list)
-                    article_loader.add_value('subtitle', subtitle)
-
-                # ---TIME
-                if selectors.get('time') != None:
-                    time_text = article.css(selectors['time']).extract()
-                    p(time_text)
-                    time_parsed = get_clean_time(time_text)
-                    p(time_parsed)
-                    article_loader.add_value('time', time_parsed)
-
-                # ---VIEWS
-                if selectors.get('views') != None:
-                    views_list = article.css(
-                        selectors['views']).extract()
-
-                    if media == "ukranews":
-                        views = views_list[-1]
+                    # ---LINK
+                    article_href = article.css(selectors['link']).extract_first()
+                    if 'http' in article_href:
+                        article_url = article_href
                     else:
-                        views = get_clean_text(views_list)
-                        # TODO extract to utility function get_views(media, dirty_value)
-                        # it is supposed that media specific formatting is moved to media_config
-                        if 'т' in views:
-                            views = views.replace(' ', '')
-                            if '.' in views:
-                                views = views.replace('.', '')
+                        article_url = config.get('url_prefix') + article_href
+
+                    # ---check whether this link`s been already parsed
+                    if article_url in response.meta['urls_to_skip']:
+                        p('ALREADY IN DB')
+                        continue
+
+                    article_loader = ItemLoader(
+                        item=MediaScraperItem(),
+                        selector=article
+                    )
+                    article_loader.add_value('link', article_url)
+                    # ---DATE
+                    article_loader.add_value('date', article_date)
+
+                    # ---DOMAIN
+                    article_loader.add_value(
+                        'domain', config.get('domain'))
+
+                    # ---TITLE
+                    title_text_dirty_list = article.css(
+                        selectors['title']).extract()
+                    title_clean = get_clean_text(title_text_dirty_list)
+                    article_loader.add_value('title', title_clean)
+
+                    # ---SUBTITLE
+                    if selectors.get('subtitle') != None:
+                        subtitle_text_list = article.css(
+                            selectors['subtitle']).extract()
+                        subtitle = get_clean_text(subtitle_text_list)
+                        article_loader.add_value('subtitle', subtitle)
+
+                    # ---TIME
+                    if selectors.get('time') != None:
+                        time_text = article.css(selectors['time']).extract()
+                        p(time_text)
+                        time_parsed = get_clean_time(time_text)
+                        p(time_parsed)
+                        article_loader.add_value('time', time_parsed)
+
+                    # ---VIEWS
+                    if selectors.get('views') != None:
+                        views_list = article.css(
+                            selectors['views']).extract()
+
+                        if media == "ukranews":
+                            views = views_list[-1]
+                        else:
+                            views = get_clean_text(views_list)
+                            # TODO extract to utility function get_views(media, dirty_value)
+                            # it is supposed that media specific formatting is moved to media_config
+                            if 'т' in views:
+                                views = views.replace(' ', '')
+                                if '.' in views:
+                                    views = views.replace('.', '')
+                                    views = views.replace('т', '00')
+                                if ',' in views:
+                                    views = views.replace(',', '')
                                 views = views.replace('т', '00')
-                            if ',' in views:
-                                views = views.replace(',', '')
-                            views = views.replace('т', '00')
 
-                    article_loader.add_value('views', views)
+                        article_loader.add_value('views', views)
 
-                yield scrapy.Request(
-                    url=article_url,
-                    callback=self.parse_article_body,
-                    meta={
-                        'media': media,
-                        'article_loader': article_loader
-                    }
-                )
+                    yield scrapy.Request(
+                        url=article_url,
+                        callback=self.parse_article_body,
+                        meta={
+                            'media': media,
+                            'article_loader': article_loader
+                        }
+                    )
 
         # після перебору всіх артиклів перевіряємо чи потрібно йти на наступну сторінку
         # TODO схоже принаймні для еспресо (знайти виключення!!) можна просто брати href з кнопки
-        if selectors.get('next_page') != None:       
-        
-            next_page_button_url = response.css(
-                selectors['next_page']).extract_first()
-
-            if next_page_button_url == None or next_page_button_url == 'javascript:;':
-                return
-
-            if 'http' in next_page_button_url:
-                next_page_url = next_page_button_url
-            else:
-                next_page_url = config.get(
-                    'url_prefix') + next_page_button_url
-
-            
-
-            p(f"NEXT BUTTON URL: {next_page_button_url}")
+        if selectors.get('next_page') != None:  
 
             current_page_number = response.meta.get('page_number')
+            # не шукаємо урл на сторінці, а просто збільшуємо page_number на 1
+            # зараз працює для свободи і обозревателя
+            if selectors.get('next_page') == 'next_number':
+                next_page_url = get_media_url(
+                    media,
+                    date=date_start,
+                    date_end=date_end,
+                    page_number=current_page_number+1
+                )
 
-            # next_page_url = get_media_url(
-            #     media,
-            #     date=date_start,
-            #     date_end=date_end,
-            #     page_number=current_page_number+1
-            # )
+            else:
+                next_page_button_url = response.css(
+                    selectors['next_page']).extract_first()
+
+                if next_page_button_url == None or next_page_button_url == 'javascript:;':
+                    return
+
+                if 'http' in next_page_button_url:
+                    next_page_url = next_page_button_url
+                else:
+                    next_page_url = config.get(
+                        'url_prefix') + next_page_button_url
+
+                
+
+                p(f"NEXT BUTTON URL: {next_page_button_url}")
+
 
             p(f"next_page_url: {next_page_url}")
             new_meta = response.meta.copy()
@@ -298,7 +325,7 @@ class MediaSpider(scrapy.Spider):
         media = response.meta['media']
         selectors = media_config[media]['selectors']
         text = response.css(selectors['text']).extract_first()
-
+        
         # text може бути None, коли у стрічці новин посилання на підсайти з іншою версткою (типу лайфстайл, спорт, і т.д.)
         # або коли новина складається тільки з відео
         if text == None:
@@ -307,6 +334,51 @@ class MediaSpider(scrapy.Spider):
 
         article_loader = response.meta['article_loader']
 
+        # коли немає часу чи дата може бути помилкова отримуємо дату зі сторінки зі статтею
+        # поки працює для громадського і еспресо
+        if selectors.get('date_in_text') != None:
+            date_from_text = response.css(selectors['date_in_text']).get().strip()
+            p(date_from_text, 'DATE FROM TEXT')
+            date_from_text = parse_date_from_article_page(media, date_from_text)
+            p(date_from_text, 'PARSED DATE FROM TEXT')
+            article_loader.replace_value('date', date_from_text)
+
         article_loader.add_value('text', text)
 
         yield article_loader.load_item()
+
+
+
+    def parse_json_result(self, all_articles, selectors, config, media, urls_to_skip):
+        for article in all_articles:
+
+            article_loader = ItemLoader(
+            item=MediaScraperItem(),
+            selector=article)
+
+            # вибираємо з json потрібні значення
+            article_url = None
+            for key, selector in selectors.items():
+                if isinstance(selector, list):
+                    value = article
+                    # цикл для вкладених рівнів
+                    for k in selector:
+                        value = value[k]
+
+                    if key =='link':
+                        if value in urls_to_skip:
+                            p('ALREADY IN DB')
+                            break
+                        article_url = value
+
+                    if key == 'date':
+                        value = parse_date(media, value)
+
+                    article_loader.add_value(key, value)
+         
+            article_loader.add_value('domain', config.get('domain'))
+
+            yield article_loader, article_url
+        
+
+

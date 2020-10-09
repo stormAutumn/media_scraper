@@ -19,7 +19,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'https://www.epravda.com.ua',
         'url_prefix': 'https://www.epravda.com.ua',
-        'url_template': 'https://www.epravda.com.ua/archives/date_{date}',
+        'url_template': 'https://www.epravda.com.ua/archives/date_{date}/',
         'selectors': {
             'main_container': 'div.news_list>div.article.article_news',
             'title': 'div.article__title > a::text',
@@ -29,21 +29,25 @@ media_config = {
             'time': 'div.article__time::text'
         }
     },
+    # Дістаємо дані із json через декілька вкладених рівнів, тому ключі по порядку занесені у список 
+    # зараз в обозревателя і свободи 'next_page': 'next_number' означає, що їх наступна сторінка 
+    # формується просто збільшенням page_number на 1
     'obozrevatel': {
         'start_request_type': 'media_scraper',
         'domain': 'https://www.obozrevatel.com',
-        'url_prefix': '',
-        'url_template': 'https://www.obozrevatel.com/ukr/main-item/{date}.htm',
+        'url_template': 'https://www.obozrevatel.com/api/news/newslist/relatednews/pictureoftheday/?page={page_number}&date={date}&language=ua',
         'selectors': {
-            'main_container': 'article.news',
-            'title': 'h3.news_title>a::text',
-            'text': 'div.newsFull_text',
-            'subtitle': 'article.news>p.news_descr>a::text',
-            'link': 'a::attr(href)',
-            'date': 'div.news_footer>time.time::attr(datetime)',
-            'views': 'footer.reaction>div.reaction_item:first-child>span.reaction_value::text'
+            'main_container': 'Data',
+            'link': ['Localizations','ua','Url'],
+            'title': ['Localizations','ua','Title'],
+            'subtitle': ['Localizations','ua','Description'],
+            'date': ['PublishDate'],
+            'views': ['ViewCount'],
+            'text': 'div.newsFull_text,div.news-full__text',
+            'next_page': 'next_number'
         }
     },
+
     'rbc': {
         'start_request_type': 'media_scraper',
         'domain': 'https://www.rbc.ua',
@@ -238,8 +242,8 @@ media_config = {
             'text': 'div.body-container',
             'link': 'div.media-block > a::attr(href)',
             'date': 'div.media-block span.date ::text',
-            'next_page': 'p.buttons.btn--load-more > a::attr(href)',
-            'next_page_number': 'only_page_number'
+            # 'next_page': 'p.buttons.btn--load-more > a::attr(href)',
+            'next_page': 'next_number'
         }
     },
     '112': {
@@ -376,11 +380,12 @@ media_config = {
             'main_container': '.NewsPostList > .NewsPublicationCard',
             'title': 'div.NewsPublicationCard-title::text',
             'link': '::attr(href)',
-            'text': 'div.PostPreview-contentWrapper',
-            'time': 'div.NewsPublicationCard-time::text',
+            'text': 'div.PostContent-body',
+            # 'time': 'div.NewsPublicationCard-time::text',
             'next_page': 'div.NewsPostList-loadMore> a::attr(href)',
             'next_page_number': 'only_page_number',
-            'date_header': 'div.NewsPostList > div.DateHeader > span::text'
+            'date_header': 'div.NewsPostList > div.DateHeader > span::text',
+            'date_in_text': 'div.PostHeader-published::text'
         }
     },
     'espreso': {
@@ -392,11 +397,12 @@ media_config = {
             'main_container': 'div.news-list ul.list > li',
             'title': 'div.txt a::text',
             'link': 'a::attr(href)',
-            'time': 'div.time::text',
+            # 'time': 'div.time::text',
             'text': 'div.article',
-            'next_page': 'div.b_center_pager>ul.pager_list li.page+li.arrow',
+            'next_page': 'div.b_center_pager>ul.pager_list li.page+li.arrow>a::attr(href)',
             'next_page_number': 'only_page_number',
-            'date_header': 'div.news-list.big.time-stamp > h2::text'
+            'date_header': 'div.news-list.big.time-stamp > h2::text',
+            'date_in_text': 'div.authorDate>span[itemprop="datePublished"]::text'
         }
     },
     # цензор банить, якщо великий інтервал дат. збільшення time_out in setting doesn`t help
