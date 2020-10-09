@@ -13,7 +13,7 @@ import json
 
 from media_config import media_config
 from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
-                    get_clean_time, parse_date
+                    get_clean_time, parse_date, parse_date_from_article_page
 
 from scrapy.utils.project import get_project_settings
 
