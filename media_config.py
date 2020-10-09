@@ -7,12 +7,12 @@ media_config = {
         'url_prefix': 'https://www.pravda.com.ua',
         'url_template': 'https://www.pravda.com.ua/archives/date_{date}',
         'selectors': {
-            'main_container': 'div.news.news_all>div.article',
-            'title': 'div.article__title > a::text',
-            'subtitle': 'div.article__subtitle::text',
-            'text': 'article.post>div.block_post>div.post_text',
-            'link': 'div.article__title a::attr(href)',
-            'time': 'div.article__time ::text'
+            'main_container': 'div.article_news_list',
+            'title': 'div.article_content > div.article_header > a::text',
+            'subtitle': 'div.article_content > div.article_subheader::text',
+            'text': 'div.container_sub_post_news > article.post > div.block_post',
+            'link': 'div.article_content a::attr(href)',
+            'time': 'div.article_time::text'
         }
     },
     'epravda': {
@@ -469,6 +469,18 @@ media_config = {
             'title': 'a::text',
             'text': 'div.article__content__body',
             'link': 'a::attr(href)'
+        }
+    },
+    'babel': {
+        'start_request_type': 'media_scraper',
+        'domain': 'babel.ua',
+        'url_template': 'https://babel.ua/text-sitemap/{date}',
+        'selectors': {
+            'main_container': 'div:nth-child(6) > ul > li',
+            'title': 'a::text',
+            'text': 'div.c-post-text.js-article-content',
+            'link': 'a::attr(href)',
+            'text_date': 'div.c-post-data-box time::attr(datetime)'
         }
     }
 }

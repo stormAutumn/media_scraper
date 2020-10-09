@@ -77,6 +77,11 @@ def get_date(date, media):
         year = date.strftime("%Y")
         month = date.strftime("%B").lower()
         return year + '/' + month
+    if media == 'babel':
+        year = date.strftime("%Y")
+        month = date.strftime(no_zero_format + "m")
+        day = date.strftime(no_zero_format + "d")
+        return year + '-' + month + '/' + day
 
 
 def get_media_url(media, date=None, date_end=None, page_number=None):
@@ -162,7 +167,7 @@ def parse_date(media, date_response_format):
     if media == 'interfax' or media == 'hromadske_radio':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
-    if media == 'censor' or media == 'tsn':
+    if media == 'censor' or media == 'tsn' or media == 'babel':
         # get rid of +02:00 or +03:00
         date_response_format = re.sub(r'\+0\d\:00', '', date_response_format)
         date_parsed = dateparser.parse(date_response_format, date_formats=[
