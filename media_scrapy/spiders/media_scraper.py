@@ -129,7 +129,7 @@ class MediaSpider(scrapy.Spider):
             if not all_articles:
                 print(f'Parsed all pages for {date_start}: finishing')
                 return 
-
+                
             for article_loader, article_url in self.parse_json_result(all_articles, selectors, config, media, response.meta['urls_to_skip']):
                 if article_url:
                     yield scrapy.Request(
@@ -333,7 +333,16 @@ class MediaSpider(scrapy.Spider):
             return
 
         article_loader = response.meta['article_loader']
-        
+
+        # коли немає часу чи дата може бути помилкова отримуємо дату зі сторінки зі статтею
+        # поки працює для громадського і еспресо
+        if selectors.get('date_in_text') != None:
+            date_from_text = response.css(selectors['date_in_text']).get().strip()
+            p(date_from_text, 'DATE FROM TEXT')
+            date_from_text = parse_date_from_article_page(media, date_from_text)
+            p(date_from_text, 'PARSED DATE FROM TEXT')
+            article_loader.replace_value('date', date_from_text)
+
         article_loader.add_value('text', text)
 
         yield article_loader.load_item()

@@ -381,10 +381,11 @@ media_config = {
             'title': 'div.NewsPublicationCard-title::text',
             'link': '::attr(href)',
             'text': 'div.PostContent-body',
-            'time': 'div.NewsPublicationCard-time::text',
+            # 'time': 'div.NewsPublicationCard-time::text',
             'next_page': 'div.NewsPostList-loadMore> a::attr(href)',
             'next_page_number': 'only_page_number',
-            'date_header': 'div.NewsPostList > div.DateHeader > span::text'
+            'date_header': 'div.NewsPostList > div.DateHeader > span::text',
+            'date_in_text': 'div.PostHeader-published::text'
         }
     },
     'espreso': {
@@ -396,11 +397,12 @@ media_config = {
             'main_container': 'div.news-list ul.list > li',
             'title': 'div.txt a::text',
             'link': 'a::attr(href)',
-            'time': 'div.time::text',
+            # 'time': 'div.time::text',
             'text': 'div.article',
             'next_page': 'div.b_center_pager>ul.pager_list li.page+li.arrow>a::attr(href)',
             'next_page_number': 'only_page_number',
-            'date_header': 'div.news-list.big.time-stamp > h2::text'
+            'date_header': 'div.news-list.big.time-stamp > h2::text',
+            'date_in_text': 'div.authorDate>span[itemprop="datePublished"]::text'
         }
     },
     # цензор банить, якщо великий інтервал дат. збільшення time_out in setting doesn`t help

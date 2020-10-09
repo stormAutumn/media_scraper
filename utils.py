@@ -188,6 +188,16 @@ def parse_date(media, date_response_format):
     return date_parsed
 
 
+def parse_date_from_article_page(media, date_from_text):
+    if media == 'espreso':
+        date_parsed = dateparser.parse(date_from_text, date_formats=[
+            '%d %B, %Y, %H:%M'], languages=['uk'])
+    if media == 'hromadske':
+        date_parsed = dateparser.parse(date_from_text, date_formats=[
+            '%d %B, %Y %H:%M'], languages=['uk'])
+    return date_parsed
+
+
 def get_clean_text(dirty_text_list):
     joined_text = ''.join(dirty_text_list)
     text_stripped = joined_text.strip()
