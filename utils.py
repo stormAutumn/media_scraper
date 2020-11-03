@@ -178,18 +178,18 @@ def parse_date(media, date_response_format):
     if media == 'espreso':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B, %Y'], languages=['uk'])
-
     if media == 'hromadske':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B'], languages=['uk'])
-
     if media == 'korrespondent':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y, %H:%M'], languages=['uk'])
-
     if media == 'obozrevatel':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%Y-%m-%dT%H:%M:%S'], languages=['uk'])
+    if media == 'zaxid':
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%d %B'], languages=['uk'])
     return date_parsed
 
 

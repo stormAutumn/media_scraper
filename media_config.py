@@ -29,8 +29,8 @@ media_config = {
             'time': 'div.article__time::text'
         }
     },
-    # Дістаємо дані із json через декілька вкладених рівнів, тому ключі по порядку занесені у список 
-    # зараз в обозревателя і свободи 'next_page': 'next_number' означає, що їх наступна сторінка 
+    # Дістаємо дані із json через декілька вкладених рівнів, тому ключі по порядку занесені у список
+    # зараз в обозревателя і свободи 'next_page': 'next_number' означає, що їх наступна сторінка
     # формується просто збільшенням page_number на 1
     'obozrevatel': {
         'start_request_type': 'media_scraper',
@@ -38,9 +38,9 @@ media_config = {
         'url_template': 'https://www.obozrevatel.com/api/news/newslist/relatednews/pictureoftheday/?page={page_number}&date={date}&language=ua',
         'selectors': {
             'main_container': 'Data',
-            'link': ['Localizations','ua','Url'],
-            'title': ['Localizations','ua','Title'],
-            'subtitle': ['Localizations','ua','Description'],
+            'link': ['Localizations', 'ua', 'Url'],
+            'title': ['Localizations', 'ua', 'Title'],
+            'subtitle': ['Localizations', 'ua', 'Description'],
             'date': ['PublishDate'],
             'views': ['ViewCount'],
             'text': 'div.newsFull_text,div.news-full__text',
@@ -486,7 +486,21 @@ media_config = {
             'title': 'a::text',
             'text': 'div.c-post-text.js-article-content',
             'link': 'a::attr(href)',
-            'text_date': 'div.c-post-data-box time::attr(datetime)'
+            'date_in_text': 'div.c-post-data-box time::attr(datetime)'
+        }
+    },
+    'zaxid': {
+        'start_request_type': 'pages_scraper',
+        'domain': 'zaxid.net',
+        'url_template': 'https://zaxid.net/news/',
+        'selectors': {
+            'main_container': 'div.row div.news-list.archive-list  ul.list > li',
+            'title': 'a > div.news-title::text',
+            'text': 'div.article_news.next-article div#newsSummary',
+            'link': 'a::attr(href)',
+            'time': 'a > div.time::text',
+            'date_header': 'div.row div.news-list.archive-list  h5.center_title > span::text',
+            'next_page': 'div.b_center_pager li.arrow:last-child > a::attr(href)'
         }
     }
 }
