@@ -135,7 +135,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': '24tv.ua',
         'url_prefix': '',
-        'url_template': 'https://24tv.ua/archive/{date}/',
+        'url_template': 'https://news.24tv.ua/archive/{date}/',
         'selectors': {
             'main_container': 'ul.list>li>div.txt',
             'title': 'a::text',

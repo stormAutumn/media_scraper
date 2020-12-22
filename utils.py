@@ -167,7 +167,7 @@ def parse_date(media, date_response_format):
     if media == 'interfax' or media == 'hromadske_radio':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
-    if media == 'censor' or media == 'tsn' or media == 'babel':
+    if media == 'censor' or media == 'tsn':
         # get rid of +02:00 or +03:00
         date_response_format = re.sub(r'\+0\d\:00', '', date_response_format)
         date_parsed = dateparser.parse(date_response_format, date_formats=[
@@ -200,6 +200,10 @@ def parse_date_from_article_page(media, date_from_text):
     if media == 'hromadske':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
             '%d %B, %Y %H:%M'], languages=['uk'])
+    if media == 'babel':
+        date_response_format = re.sub(r'\+0\d\:00', '', date_from_text)
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%Y-%m-%dT%H:%M:%S'], languages=['uk'])
     return date_parsed
 
 
