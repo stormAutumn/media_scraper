@@ -495,10 +495,11 @@ media_config = {
         'url_template': 'https://zaxid.net/news/',
         'selectors': {
             'main_container': 'div.row div.news-list.archive-list  ul.list > li',
-            'title': 'a > div.news-title::text',
+            'title': 'a > div.news-title::text,div.title::text',
             'text': 'div.article_news.next-article div#newsSummary',
             'link': 'a::attr(href)',
             'time': 'a > div.time::text',
+            'category_in_text': 'div.info_wrap>a.category::text',
             'date_header': 'div.row div.news-list.archive-list  h5.center_title > span::text',
             'next_page': 'div.b_center_pager li.arrow:last-child > a::attr(href)'
         }
