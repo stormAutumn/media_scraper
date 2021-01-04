@@ -200,6 +200,8 @@ def parse_date_from_article_page(media, date_from_text):
     if media == 'hromadske':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
             '%d %B, %Y %H:%M'], languages=['uk'])
+    if media == 'babel':
+        date_parsed = dateparser.parse(date_from_text)
     return date_parsed
 
 
