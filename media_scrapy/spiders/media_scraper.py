@@ -343,6 +343,12 @@ class MediaSpider(scrapy.Spider):
             p(date_from_text, 'PARSED DATE FROM TEXT')
             article_loader.replace_value('date', date_from_text)
 
+        if selectors.get('category_in_text') != None:
+            category_from_text = response.css(selectors['category_in_text']).get()
+            if category_from_text:
+                category_from_text = category_from_text.strip()
+                article_loader.add_value('category', category_from_text)
+
         article_loader.add_value('text', text)
 
         yield article_loader.load_item()
