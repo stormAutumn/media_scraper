@@ -19,3 +19,4 @@ class MediaScraperItem(scrapy.Item):
     domain = scrapy.Field()
     views = scrapy.Field()
     language = scrapy.Field()
+    category = scrapy.Field()

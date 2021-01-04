@@ -31,9 +31,9 @@ class DatabasePipeline(object):
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):
-        sql = ''.join(['INSERT INTO news_items ',
-                       '(title, domain, link, datetime, subtitle, text, views) ',
-                       'VALUES ( %s, %s, %s, %s, %s, %s, %s)'])
+        sql = ''.join(['INSERT INTO december ',
+                       '(title, domain, link, datetime, subtitle, text, views, category) ',
+                       'VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)'])
 
         title = item.get("title")[0]
         domain = item.get("domain")[0]
@@ -64,6 +64,10 @@ class DatabasePipeline(object):
             views = item.get("views")[0]
         else:
             views = None
+        if "category" in item.keys():
+            category = item.get("category")[0]
+        else:
+            category = None
 
         self.cursor.execute(sql,
                             (
@@ -74,6 +78,7 @@ class DatabasePipeline(object):
                                 subtitle,
                                 text,
                                 views,
+                                category
                             )
                             )
         self.conn.commit()
