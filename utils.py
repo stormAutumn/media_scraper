@@ -131,12 +131,15 @@ def parse_date(media, date_response_format):
     if media == 'interfax':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%H:%M %d.%m.%Y'], languages=['uk'])
-    if media == 'znaj':
+    if media == 'znaj' or media == 'politeka':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%H:%M %d.%m'], languages=['uk'])
+        # якщо номер поточного місяця менший, значить збираємо новини за минулий рік
+        if datetime.now().month < date_parsed.month:
+            date_parsed = date_parsed.replace(year=date_parsed.year-1)
     if media == '24tv' or media == 'glavcom' or media == 'suspilne':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
-            '%d %B, %H:%M'], languages=['uk'])
+            '%d %B %Y, %H:%M'], languages=['uk'])
     if media == 'gordonua':
         date_response_format = date_response_format.replace(
             ".", ":").replace("i", "і")
@@ -146,6 +149,7 @@ def parse_date(media, date_response_format):
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%Y-%m-%dT%H:%M:%SZ'], languages=['uk'])
     if media == 'ictv':
+        date_response_format = re.sub('C', 'С', date_response_format)
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%B, %d о %H:%M'], languages=['uk'])
     if media == 'strana':
@@ -155,18 +159,12 @@ def parse_date(media, date_response_format):
         date_response_format = date_response_format.rsplit(' ', 1)[0]
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y, %H:%M'], languages=['ru'])
-    if media == 'znaj':
-        date_parsed = dateparser.parse(date_response_format, date_formats=[
-            '%H:%M, %d.%m'], languages=['uk'])
     if media == '112' or media == 'vgolos':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
     if media == 'svoboda' or media == 'gazetaua':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y'], languages=['uk'])
-    if media == 'politeka':
-        date_parsed = dateparser.parse(date_response_format, date_formats=[
-            '%H:%M %d.%m'], languages=['uk'])
     if media == 'hromadske_radio':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
@@ -181,6 +179,9 @@ def parse_date(media, date_response_format):
     if media == 'hromadske':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B'], languages=['uk'])
+        # якщо номер поточного місяця менший, значить збираємо новини за минулий рік
+        if datetime.now().month < date_parsed.month:
+            date_parsed = date_parsed.replace(year=date_parsed.year-1)
     if media == 'korrespondent':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y, %H:%M'], languages=['uk'])
@@ -193,10 +194,10 @@ def parse_date(media, date_response_format):
 
 def parse_date_from_article_page(media, date_from_text):
     date_from_text = date_from_text.strip()
-    if media == 'espreso' or media == 'hromadske':
+    if media == 'espreso':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
             '%d %B, %Y %H:%M'], languages=['uk'])
-    if media == 'babel' or media  == 'svoboda':
+    if media == 'babel' or media  == 'svoboda' or media=='hromadske':
         date_parsed = dateparser.parse(date_from_text)
     if media == 'vgolos':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
@@ -207,14 +208,14 @@ def parse_date_from_article_page(media, date_from_text):
     if media  == 'segodnya':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
             '%d %B, %H:%M'], languages=['uk'])
-       return date_parsed
+    return date_parsed
 
 
 def get_clean_text(dirty_text_list):
     joined_text = ''.join(dirty_text_list)
     text_stripped = joined_text.strip()
-    text_stripped = re.sub(r'\n|\t|\,', '', text_stripped)
-    text_clean = re.sub(r' {2,}', ' ', text_stripped)
+    text_clean = text_stripped.replace('\n,', '').replace('\t', '')
+    text_clean = re.sub(r' {2,}', ' ', text_clean)
     return text_clean
 
 
@@ -228,6 +229,8 @@ def get_clean_views(media, dirty_views_list):
         return dirty_views_list[-1]
     if media == 'gazetaua':
         return dirty_views_list[0].split()[-1]
+    if media == 'epravda':
+        return dirty_views_list[0].split()[0]
 
     return get_clean_text(dirty_views_list)
 
