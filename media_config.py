@@ -5,13 +5,14 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'https://www.pravda.com.ua',
         'url_prefix': 'https://www.pravda.com.ua',
-        'url_template': 'https://www.pravda.com.ua/archives/date_{date}',
+        'url_template': 'https://www.pravda.com.ua/archives/date_{date}/',
         'selectors': {
             'main_container': 'div.article_news_list',
             'title': 'div.article_content > div.article_header > a::text',
             'subtitle': 'div.article_content > div.article_subheader::text',
             'text': 'div.container_sub_post_news > article.post > div.block_post',
             'link': 'div.article_content a::attr(href)',
+            'views_in_text': 'div.post_views::text',
             'time': 'div.article_time::text'
         }
     },
@@ -26,7 +27,8 @@ media_config = {
             'text': 'div.block_post>div.post__text',
             'subtitle': 'div.article__subtitle ::text',
             'link': 'div.article__title a::attr(href)',
-            'time': 'div.article__time::text'
+            'time': 'div.article__time::text',
+            'views_in_text': 'div.post__statistic>div.post__views::text'
         }
     },
     # Дістаємо дані із json через декілька вкладених рівнів, тому ключі по порядку занесені у список
@@ -145,7 +147,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': '24tv.ua',
         'url_prefix': '',
-        'url_template': 'https://news.24tv.ua/archive/{date}/',
+        'url_template': 'https://24tv.ua/archive/{date}/',
         'selectors': {
             'main_container': 'ul.list>li>div.txt',
             'title': 'a::text',
@@ -175,7 +177,7 @@ media_config = {
     'gordonua': {
         'start_request_type': 'media_scraper',
         'domain': 'gordonua.com',
-        'url_prefix': 'https://gordonua.com/ukr',
+        'url_prefix': 'https://gordonua.com',
         'url_template': 'https://gordonua.com/ukr/news/archive/{date}.html',
         'selectors': {
             'main_container': 'div.row> div.span-8 > div.block > div.lenta > div.media > div.row > div.span-8',
@@ -183,7 +185,8 @@ media_config = {
             'text': 'div.block.article',
             'subtitle': 'div.span-8 > div.a_description::text',
             'link': 'div.span-8 > div.lenta_head > a::attr(href)',
-            'date': 'div.span-8 > div.for_data::text'
+            'date': 'div.span-8 > div.for_data::text',
+            'category': 'div.lenta_div>a::text'
         }
     },
     'apostrophe': {
@@ -194,10 +197,13 @@ media_config = {
         'selectors': {
             'main_container': 'div.entry_news',
             'title': 'div.entry_news > a > strong::text',
-            'text': 'div.content',
+            # 'text': 'div.content',
+            'text': 'div[itemprop="articleBody"]',
             'subtitle': 'a > div.title_short::text',
             'link': 'a::attr(href)',
-            'time': 'div.ni__date.lorange::text'
+            'time': 'div.ni__date.lorange::text',
+            'category_in_text':'div.nav>ul.nav-list>li.is-active>a::text'
+
         }
     },
     'unn': {
@@ -281,6 +287,7 @@ media_config = {
             'link': 'a::attr(href)',
             'date': 'div > span::text',
             'time': 'div > span > time::text',
+            'category_in_text': 'ul.row.align-middle li.breadcrumbs-link:last-child span::text',
             'next_page': 'ul.pagination > li.next> a::attr(href)'
         }
     },
@@ -297,6 +304,7 @@ media_config = {
             'text': 'div.bottom_block div.article_body',
             'time': 'div.news_block_item::attr(data-type)',
             'next_page': 'div.navigate > span.next>a::attr(href)',
+            'category_in_text': 'ol.breadcrumb_main li[itemprop="itemListElement"]:last-child span::text',
             'next_page_number': 'page_and_date'
         }
     },
@@ -328,7 +336,7 @@ media_config = {
             'subtitle': 'div.b-card--caption > h5::text',
             'link': '::attr(href)',
             'date': 'div.b-card--caption > time::text',
-            'category_in_text': 'span.label.label-category::text',
+            # 'category_in_text': 'span.label.label-category::text',
             'next_page': 'ul.pagination > li.page-item > a[rel="next"]::attr(href)'
         }
     },
@@ -410,7 +418,8 @@ media_config = {
             'next_page': 'div.NewsPostList-loadMore> a::attr(href)',
             'next_page_number': 'only_page_number',
             'date_header': 'div.NewsPostList > div.DateHeader > span::text',
-            'date_in_text': 'div.PostHeader-published::text'
+            'category_in_text': 'a.PostHeader-topic>div::text',
+            'date_in_text': 'div[itemprop="datePublished"]::attr(content)'
         }
     },
     'espreso': {
@@ -427,6 +436,7 @@ media_config = {
             'next_page': 'div.b_center_pager>ul.pager_list li.page+li.arrow>a::attr(href)',
             'next_page_number': 'only_page_number',
             'date_header': 'div.news-list.big.time-stamp > h2::text',
+            'category_in_text': 'div.breadcrumbs a:nth-child(3)::text',
             'date_in_text': 'div.authorDate>span[itemprop="datePublished"]::text'
         }
     },
@@ -442,7 +452,8 @@ media_config = {
             'title': 'h3>a::text',
             'subtitle': 'div.anounce > a::text',
             'link': 'div.anounce > a::attr(href)',
-            'text': 'section.hnews.hentry.item',
+            'text': 'div.text',
+            # 'text': 'section.hnews.hentry.item',
             # 'text': 'div.entry-content._ga1_on_[itemprop="articleBody"]',
             'date': 'time::attr(datetime)',
             'views': 'div.hit > span > span.info::text',
@@ -479,6 +490,7 @@ media_config = {
             'subtitle': 'div.header::text',
             'text': 'div.body',
             'link': 'time + a::attr(href)',
+            'category_in_text': 'div.col-xs-12.col-md-8>div.chapter>a::text',
             'date': 'time::text'
         }
     },
@@ -561,7 +573,7 @@ media_config = {
         'domain': 'babel.ua',
         'url_template': 'https://babel.ua/text-sitemap/{date}',
         'selectors': {
-            'main_container': 'div:nth-child(6) > ul > li',
+            'main_container': 'div:nth-child(7) > ul > li',
             'title': 'a::text',
             'text': 'div.c-post-text.js-article-content',
             'link': 'a::attr(href)',
