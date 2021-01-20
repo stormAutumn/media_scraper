@@ -356,14 +356,9 @@ class MediaSpider(scrapy.Spider):
             p(response.url)
             return
 
-        # for key, selector in selectors.items():
-        #     if key.endswith('_in_text'):
-                
-
         article_loader = response.meta['article_loader']
 
-        # коли немає часу чи дата може бути помилкова отримуємо дату зі сторінки зі статтею
-        # поки працює для громадського і еспресо
+        # коли немає часу чи дата на основній сторінці може бути помилкова, отримуємо дату зі сторінки зі статтею
         if selectors.get('date_in_text') != None:
             date_from_text = response.css(selectors['date_in_text']).get()
             if date_from_text:
@@ -381,7 +376,6 @@ class MediaSpider(scrapy.Spider):
             views = response.css(selectors['views_in_text']).extract()
             if views:
                 views = get_clean_views(media, views)
-                # views = views.strip()
                 article_loader.add_value('views', views)
 
         if selectors.get('subtitle_in_text') != None:
@@ -389,12 +383,6 @@ class MediaSpider(scrapy.Spider):
             if subtitle:
                 subtitle = subtitle.strip()
                 article_loader.add_value('subtitle', subtitle)
-
-        if selectors.get('category_in_text') != None:
-            category_from_text = response.css(selectors['category_in_text']).get()
-            if category_from_text:
-                category_from_text = category_from_text.strip()
-                article_loader.add_value('category', category_from_text)
 
         article_loader.add_value('text', text)
 
