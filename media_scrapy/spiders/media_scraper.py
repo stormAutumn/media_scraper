@@ -42,7 +42,7 @@ class MediaSpider(scrapy.Spider):
                                 host=db_settings['host'])
         cursor = conn.cursor()
         # не має залежити від списку ЗМІ що обробляється через перехресні посилання як у УП та ЄП
-        sql_query = 'SELECT link FROM november'
+        sql_query = 'SELECT link FROM news_items'
         cursor.execute(sql_query)
         fetched_records = cursor.fetchall()
         records = []
@@ -58,11 +58,11 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-            if media != 'obozrevatel':
+            if media != '112':
                 continue
 
-            date_start = datetime(2020, 11, 1)
-            date_end = datetime(2020, 11, 30)
+            date_start = datetime(2020, 12, 1)
+            date_end = datetime(2020, 12, 31)
 
             page_number = 1
 
@@ -183,14 +183,6 @@ class MediaSpider(scrapy.Spider):
                     date_header = date_headers[0]
                     article_date = parse_date(media, date_header)
                     current_date = article_date
-
-            last_date = all_articles[-1].css(selectors['date']).extract()
-            last_date = get_clean_text(last_date)
-            last_date = parse_date(media, last_date)
-            if last_date.date() > date_end.date():
-                p(last_date)
-                print('All news on page are too new: GO TO NEXT PAGE')
-                all_articles = []
             
             for article in all_articles:
                 # count += 1
@@ -204,7 +196,6 @@ class MediaSpider(scrapy.Spider):
                     article_clean_date_str = get_clean_text(
                         article_dirty_date_str)
                     article_date = parse_date(media, article_clean_date_str)
-                    p('!!!!!!!!!!!!!!!!!!!!HERE')
                     p(article_date)
 
 
@@ -282,7 +273,7 @@ class MediaSpider(scrapy.Spider):
                         category_text = article.css(selectors['category']).extract()
                         if category_text:
                             p(category_text)
-                            category = get_clean_text(category_text)
+                            category = get_categories_string(category_text)
                             article_loader.add_value('category', category)
 
                     # ---VIEWS
@@ -381,17 +372,16 @@ class MediaSpider(scrapy.Spider):
 
         if selectors.get('category_in_text') != None:
             category = response.css(selectors['category_in_text']).extract()
-            # category = response.css(selectors['category_in_text']).get()
             if category:
-                # category = category.strip()
                 category = get_categories_string(category)
                 article_loader.add_value('category', category)
 
 
         if selectors.get('views_in_text') != None:
-            views = response.css(selectors['views_in_text']).get()
+            views = response.css(selectors['views_in_text']).extract()
             if views:
-                views = views.strip()
+                views = get_clean_views(media, views)
+                # views = views.strip()
                 article_loader.add_value('views', views)
 
         if selectors.get('subtitle_in_text') != None:
