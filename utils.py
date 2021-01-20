@@ -208,7 +208,9 @@ def parse_date_from_article_page(media, date_from_text):
     if media  == 'segodnya':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
             '%d %B, %H:%M'], languages=['uk'])
+
     return date_parsed
+
 
 
 def get_clean_text(dirty_text_list):
