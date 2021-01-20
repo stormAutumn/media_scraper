@@ -207,14 +207,15 @@ def parse_date_from_article_page(media, date_from_text):
     if media  == 'segodnya':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
             '%d %B, %H:%M'], languages=['uk'])
-       return date_parsed
+    return date_parsed
+
 
 
 def get_clean_text(dirty_text_list):
     joined_text = ''.join(dirty_text_list)
     text_stripped = joined_text.strip()
-    text_stripped = re.sub(r'\n|\t|\,', '', text_stripped)
-    text_clean = re.sub(r' {2,}', ' ', text_stripped)
+    text_clean = text_stripped.replace('\n,', '').replace('\t', '')
+    text_clean = re.sub(r' {2,}', ' ', text_clean)
     return text_clean
 
 
