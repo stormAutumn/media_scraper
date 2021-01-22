@@ -13,7 +13,8 @@ import json
 
 from media_config import media_config
 from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
-                    get_clean_time, parse_date, parse_date_from_article_page
+                    get_clean_time, parse_date, parse_date_from_article_page,\
+                    get_clean_views, get_categories_string
 
 from scrapy.utils.project import get_project_settings
 
@@ -57,13 +58,17 @@ class MediaSpider(scrapy.Spider):
         for media in media_config.keys():
             config = media_config[media]
 
-            if media != 'espreso':
+            if media != '112':
                 continue
 
-            date_start = datetime(2020, 8, 1)
-            date_end = datetime(2020, 8, 31)
+            date_start = datetime(2020, 12, 1)
+            date_end = datetime(2020, 12, 31)
 
             page_number = 1
+
+            # для vgolos будемо передавати не номер сторінки, а offset, тож треба починати з 0:
+            if media == 'vgolos':
+                page_number = 0
 
             urls_dates = ()
 
@@ -122,6 +127,19 @@ class MediaSpider(scrapy.Spider):
 
         current_date = response.meta['current_date']
 
+        # газета по-українськи в своєму API повертає html сторінки в json
+        # до того ж json якийсь неправильний і його спочатку треба очистити
+        if media == 'gazetaua':
+            json_response = response.text.strip('RESTful.newsJsonpHandler();')
+            json_response = json.loads(json_response)
+            try:
+                # body = scrapy.Selector(text=json_response['html'], type="html")
+                response = response.replace(body = json_response['html'])
+
+            except KeyError:
+                print('Processed all pages: finishing')
+                return
+
         # Зараз цей випадок тільки для Обозревателя
         # але якщо ще будуть такі медіа, то можна змінити їх тип на якийсь json_scraper
         if media == 'obozrevatel':
@@ -145,6 +163,10 @@ class MediaSpider(scrapy.Spider):
         # TODO rename main_container to article_item
             all_articles = response.css(selectors['main_container'])         
 
+            if not all_articles:
+                print('No articles on page: finishing')
+                return
+
             # if media has no date selector - all articles on page have same date
             if not selectors.get('date'):
                 article_date = date_start
@@ -161,7 +183,6 @@ class MediaSpider(scrapy.Spider):
                     date_header = date_headers[0]
                     article_date = parse_date(media, date_header)
                     current_date = article_date
-
             
             for article in all_articles:
                 # count += 1
@@ -175,7 +196,6 @@ class MediaSpider(scrapy.Spider):
                     article_clean_date_str = get_clean_text(
                         article_dirty_date_str)
                     article_date = parse_date(media, article_clean_date_str)
-                    p('!!!!!!!!!!!!!!!!!!!!HERE')
                     p(article_date)
 
 
@@ -206,6 +226,9 @@ class MediaSpider(scrapy.Spider):
                         article_url = article_href
                     else:
                         article_url = config.get('url_prefix') + article_href
+
+                    if media=='zik':
+                        article_url = article_url.replace('http:', 'https:')
 
                     # ---check whether this link`s been already parsed
                     if article_url in response.meta['urls_to_skip']:
@@ -245,27 +268,22 @@ class MediaSpider(scrapy.Spider):
                         p(time_parsed)
                         article_loader.add_value('time', time_parsed)
 
+                    # ---category
+                    if selectors.get('category') != None:
+                        category_text = article.css(selectors['category']).extract()
+                        if category_text:
+                            p(category_text)
+                            category = get_categories_string(category_text)
+                            article_loader.add_value('category', category)
+
                     # ---VIEWS
                     if selectors.get('views') != None:
                         views_list = article.css(
                             selectors['views']).extract()
-
-                        if media == "ukranews":
-                            views = views_list[-1]
-                        else:
-                            views = get_clean_text(views_list)
-                            # TODO extract to utility function get_views(media, dirty_value)
-                            # it is supposed that media specific formatting is moved to media_config
-                            if 'т' in views:
-                                views = views.replace(' ', '')
-                                if '.' in views:
-                                    views = views.replace('.', '')
-                                    views = views.replace('т', '00')
-                                if ',' in views:
-                                    views = views.replace(',', '')
-                                views = views.replace('т', '00')
-
-                        article_loader.add_value('views', views)
+                        if views_list:
+                            views = get_clean_views(media, views_list)
+                            
+                            article_loader.add_value('views', views)
 
                     yield scrapy.Request(
                         url=article_url,
@@ -281,14 +299,19 @@ class MediaSpider(scrapy.Spider):
         if selectors.get('next_page') != None:  
 
             current_page_number = response.meta.get('page_number')
-            # не шукаємо урл на сторінці, а просто збільшуємо page_number на 1
-            # зараз працює для свободи і обозревателя
+            next_page_number = current_page_number+1
+            # не шукаємо урл на сторінці, а просто збільшуємо page_number
             if selectors.get('next_page') == 'next_number':
+                # поки одиничний випадок для вголос, бо там в урлі офсет збільшується на 15
+                # надалі можна буде додати це число в конфіг медіа, якщо ще будуть схожі
+                if media == 'vgolos':
+                    next_page_number = current_page_number+15
+        
                 next_page_url = get_media_url(
                     media,
                     date=date_start,
                     date_end=date_end,
-                    page_number=current_page_number+1
+                    page_number=next_page_number
                 )
 
             else:
@@ -312,7 +335,7 @@ class MediaSpider(scrapy.Spider):
             p(f"next_page_url: {next_page_url}")
             new_meta = response.meta.copy()
 
-            new_meta['page_number'] = current_page_number + 1
+            new_meta['page_number'] = next_page_number
             new_meta['current_date'] = current_date
 
             yield scrapy.Request(
@@ -330,23 +353,87 @@ class MediaSpider(scrapy.Spider):
         # або коли новина складається тільки з відео
         if text == None:
             p("SKIP BECAUSE TEXT IS NONE")
+            p(response.url)
             return
 
         article_loader = response.meta['article_loader']
 
-        # коли немає часу чи дата може бути помилкова отримуємо дату зі сторінки зі статтею
-        # поки працює для громадського і еспресо
+        # коли немає часу чи дата на основній сторінці може бути помилкова, отримуємо дату зі сторінки зі статтею
         if selectors.get('date_in_text') != None:
-            date_from_text = response.css(selectors['date_in_text']).get().strip()
-            p(date_from_text, 'DATE FROM TEXT')
-            date_from_text = parse_date_from_article_page(media, date_from_text)
-            p(date_from_text, 'PARSED DATE FROM TEXT')
-            article_loader.replace_value('date', date_from_text)
+            date_from_text = response.css(selectors['date_in_text']).get()
+            if date_from_text:
+                date_from_text = parse_date_from_article_page(media, date_from_text)
+                article_loader.replace_value('date', date_from_text)
+
+        if selectors.get('category_in_text') != None:
+            category = response.css(selectors['category_in_text']).extract()
+            if category:
+                category = get_categories_string(category)
+                article_loader.add_value('category', category)
+
+
+        if selectors.get('views_in_text') != None:
+            views = response.css(selectors['views_in_text']).extract()
+            if views:
+                views = get_clean_views(media, views)
+                article_loader.add_value('views', views)
+
+        if selectors.get('subtitle_in_text') != None:
+            subtitle = response.css(selectors['subtitle_in_text']).get()
+            if subtitle:
+                subtitle = subtitle.strip()
+                article_loader.add_value('subtitle', subtitle)
 
         article_loader.add_value('text', text)
 
+
+# НВ і 24 канал беруть кількість переглядів з іншої сторінки, на яку ми тут переходимо
+# TODO: переписати це, додавши урл у конфіг
+        if media == 'nv':
+            views_url = response.url.rsplit('-', maxsplit=1)[-1]
+            views_url = 'https://nv.ua/get_article_views/' + views_url
+            new_meta = response.meta.copy()
+            yield scrapy.Request(
+                url=views_url,
+                callback=self.get_nv_views,
+                meta=new_meta,
+            )
+        elif media == '24tv':
+            views_url = response.url.rsplit('_', maxsplit=1)[-1].strip('n')
+            views_url = 'https://counter24.luxnet.ua/counter/' + views_url
+            new_meta = response.meta.copy()
+            yield scrapy.Request(
+                url=views_url,
+                callback=self.get_24tv_views,
+                meta=new_meta,
+            )
+        else:
+            yield article_loader.load_item()
+
+
+
+    def get_nv_views(self, response):
+
+        views = response.css('::text').get()
+        article_loader = response.meta['article_loader']
+        
+        if views:
+            article_loader.add_value('views', views)
+
         yield article_loader.load_item()
 
+
+    def get_24tv_views(self, response):
+
+        views = json.loads(response.text)
+        if views and ('value' in views.keys()):
+            views = views['value']
+        article_loader = response.meta['article_loader']
+        
+        if views:
+            article_loader.add_value('views', views)
+
+        yield article_loader.load_item()
 
 
     def parse_json_result(self, all_articles, selectors, config, media, urls_to_skip):
