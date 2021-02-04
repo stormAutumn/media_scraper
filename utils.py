@@ -29,7 +29,7 @@ def get_date(date, media):
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return day + '-' + month + '-' + year
-    if media == 'rbc' or media == 'tsn' or media == 'unn' or media == 'vgolos':
+    if media in ['rbc', 'tsn', 'unn', 'vgolos', 'telegraf']:
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
@@ -233,6 +233,8 @@ def get_clean_views(media, dirty_views_list):
         return dirty_views_list[0].split()[-1]
     if media == 'epravda':
         return dirty_views_list[0].split()[0]
+    if media == 'telegraf':
+        return dirty_views_list[0].replace(',', '')
 
     return get_clean_text(dirty_views_list)
 

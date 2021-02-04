@@ -594,5 +594,21 @@ media_config = {
             'date_header': 'div.row div.news-list.archive-list  h5.center_title > span::text',
             'next_page': 'div.b_center_pager li.arrow:last-child > a::attr(href)'
         }
+    },
+    'telegraf': {
+        'start_request_type': 'media_scraper',
+        'domain': 'telegraf.com.ua',
+        'url_template': 'https://telegraf.com.ua/date/{date}/page/{page_number}/',
+        'selectors': {
+            'main_container': 'div.Nitem div.right',
+            'title': 'a::text',
+            'subtitle': 'p::text',
+            'text': 'div.content-single__block_text_body',
+            'link': 'a::attr(href)',
+            'time': 'div.time::text',
+            'category_in_text': 'div.pull-left>ul>li.active>a::text',
+            'views_in_text': 'div.article-announcement-view>b::text',
+            'next_page': 'a.next.page-numbers::attr(href)'
+        }
     }
 }
