@@ -594,5 +594,18 @@ media_config = {
             'date_header': 'div.row div.news-list.archive-list  h5.center_title > span::text',
             'next_page': 'div.b_center_pager li.arrow:last-child > a::attr(href)'
         }
+    },
+    'bykvu': {
+        'start_request_type': 'xml_scraper',
+        'domain': 'bykvu.com',
+        'url_template': 'https://bykvu.com/ua/sitemap-posttype-post.{date}.xml',
+        'selectors': {
+            'main_container': ['urlset', 'url'],
+            'title_in_text': 'article.article-item>h1::text',
+            'subtitle_in_text': 'div.lead>p::text',
+            'text': 'div.post-content',
+            'link': 'loc',
+            'date_in_text': 'div.col-6>span.meta::text'
+        }
     }
 }

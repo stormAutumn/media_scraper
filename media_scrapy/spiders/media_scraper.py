@@ -10,6 +10,8 @@ from datetime import datetime
 import dateparser
 import psycopg2
 import json
+import xmltodict
+from functools import reduce
 
 from media_config import media_config
 from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
@@ -139,6 +141,31 @@ class MediaSpider(scrapy.Spider):
             except KeyError:
                 print('Processed all pages: finishing')
                 return
+
+
+        if config.get('start_request_type') == 'xml_scraper':
+            all_articles = reduce(lambda seq, key: seq[key], selectors.get('main_container'), \
+                                xmltodict.parse(response.text))
+
+            for article in all_articles:
+                article_url = article[selectors.get('link')]
+
+                article_loader = ItemLoader(
+                        item=MediaScraperItem(),
+                        selector=article
+                    )
+
+                article_loader.add_value('link', article_url)
+                article_loader.add_value('domain', config.get('domain'))
+
+                yield scrapy.Request(
+                            url=article_url,
+                            callback=self.parse_article_body,
+                            meta={
+                                'media': media,
+                                'article_loader': article_loader
+                            }
+                        )
 
         # Зараз цей випадок тільки для Обозревателя
         # але якщо ще будуть такі медіа, то можна змінити їх тип на якийсь json_scraper
@@ -384,11 +411,17 @@ class MediaSpider(scrapy.Spider):
                 subtitle = subtitle.strip()
                 article_loader.add_value('subtitle', subtitle)
 
+        if selectors.get('title_in_text') != None:
+            title = response.css(selectors['title_in_text']).get()
+            if title:
+                title = title.strip()
+                article_loader.add_value('title', title)
+
         article_loader.add_value('text', text)
 
 
-# НВ і 24 канал беруть кількість переглядів з іншої сторінки, на яку ми тут переходимо
-# TODO: переписати це, додавши урл у конфіг
+        # НВ і 24 канал беруть кількість переглядів з іншої сторінки, на яку ми тут переходимо
+        # TODO: переписати це, додавши урл у конфіг
         if media == 'nv':
             views_url = response.url.rsplit('-', maxsplit=1)[-1]
             views_url = 'https://nv.ua/get_article_views/' + views_url
