@@ -82,6 +82,11 @@ def get_date(date, media):
         month = date.strftime(no_zero_format + "m")
         day = date.strftime(no_zero_format + "d")
         return year + '-' + month + '/' + day
+    if media == 'kp':
+        year = date.strftime("%Y")
+        month = date.strftime("%B").lower()
+        day = date.strftime(no_zero_format + "d")
+        return year + '/' + month + '/' + day
 
 
 def get_media_url(media, date=None, date_end=None, page_number=None):

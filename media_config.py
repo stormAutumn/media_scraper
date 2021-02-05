@@ -610,5 +610,19 @@ media_config = {
             'views_in_text': 'div.article-announcement-view>b::text',
             'next_page': 'a.next.page-numbers::attr(href)'
         }
+    },
+    'kp': {
+    'start_request_type': 'media_scraper',
+    'domain': 'kp.ua',
+    'url_template': 'https://kp.ua/archive/{date}/',
+    'selectors': {
+        'main_container': 'ul.news-online.news-per-day li',
+        'title': 'a::attr(title)',
+        'text': 'div.content',
+        'link': 'a::attr(href)',
+        'time': 'a>span::text',
+        'subtitle_in_text': 'div.content-info::text',
+        'category_in_text': 'div.breadcrumbs>span[typeof="v:Breadcrumb"]>a::text'
     }
+},
 }
