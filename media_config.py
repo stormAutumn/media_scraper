@@ -612,17 +612,34 @@ media_config = {
         }
     },
     'kp': {
-    'start_request_type': 'media_scraper',
-    'domain': 'kp.ua',
-    'url_template': 'https://kp.ua/archive/{date}/',
-    'selectors': {
-        'main_container': 'ul.news-online.news-per-day li',
-        'title': 'a::attr(title)',
-        'text': 'div.content',
-        'link': 'a::attr(href)',
-        'time': 'a>span::text',
-        'subtitle_in_text': 'div.content-info::text',
-        'category_in_text': 'div.breadcrumbs>span[typeof="v:Breadcrumb"]>a::text'
+        'start_request_type': 'media_scraper',
+        'domain': 'kp.ua',
+        'url_template': 'https://kp.ua/archive/{date}/',
+        'selectors': {
+            'main_container': 'ul.news-online.news-per-day li',
+            'title': 'a::attr(title)',
+            'text': 'div.content',
+            'link': 'a::attr(href)',
+            'time': 'a>span::text',
+            'subtitle_in_text': 'div.content-info::text',
+            'category_in_text': 'div.breadcrumbs>span[typeof="v:Breadcrumb"]>a::text'
+        }
+    },
+    'fakty': {
+        'start_request_type': 'media_scraper',
+        'domain': 'fakty.ua',
+        'url_prefix': 'https://fakty.ua',
+        'url_template': 'https://fakty.ua/archive/{date}',
+        'selectors': {
+            'main_container': 'div.items div.my-flex-block1',
+            'title': 'a.tit>p::text',
+            'text': 'div#article_content3',
+            'link': 'a.tit::attr(href)',
+            'time': 'span.mytime::text',
+            'date': 'span.mydate::text',
+            'views': 'span.stat_text::text',
+            'category_in_text': 'span.fl_l.my_rubrika>a::text',
+            'next_page': 'div.pager>ul li.page.active+li>a::attr(href)'
+        }
     }
-},
 }

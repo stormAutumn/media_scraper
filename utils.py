@@ -39,7 +39,7 @@ def get_date(date, media):
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return year + '-' + month + '-' + day
-    if media == 'unian':
+    if media == 'unian' or media == 'fakty':
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
@@ -193,6 +193,9 @@ def parse_date(media, date_response_format):
     if media == 'zaxid':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B'], languages=['uk'])
+    if media == 'fakty':
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%d %B %Y'], languages=['ru'])
 
     return date_parsed
 
