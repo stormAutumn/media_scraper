@@ -86,6 +86,10 @@ def get_date(date, media):
         year = date.strftime("%Y")
         month = date.strftime("%m")
         return year+month
+    if media == 'vesti':
+        year = date.strftime("%Y")
+        month = date.strftime("%m")
+        return year + '-' + month
 
 
 def get_media_url(media, date=None, date_end=None, page_number=None):
@@ -201,6 +205,9 @@ def parse_date_from_article_page(media, date_from_text):
     if media == 'espreso' or media == 'bykvu':
         date_parsed = dateparser.parse(date_from_text, date_formats=[
             '%d %B, %Y %H:%M'], languages=['uk'])
+    if media == 'vesti':
+        date_parsed = dateparser.parse(date_from_text, date_formats=[
+            '%d %B %Y, %H:%M'], languages=['ru'])
     if media == 'babel' or media  == 'svoboda' or media=='hromadske':
         date_parsed = dateparser.parse(date_from_text)
     if media == 'vgolos':

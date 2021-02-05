@@ -607,5 +607,19 @@ media_config = {
             'link': 'loc',
             'date_in_text': 'div.col-6>span.meta::text'
         }
+    },
+    'vesti': {
+        'start_request_type': 'xml_scraper',
+        'domain': 'vesti.ua',
+        'url_template': 'https://vesti.ua/sitemap-pt-post-{date}.xml',
+        'selectors': {
+            'main_container': ['urlset', 'url'],
+            'title_in_text': 'div.singleTitle > h1.singleh1Title::text',
+            'subtitle_in_text': 'div.singlePostSubtitle::text',
+            'text': 'div.singleMainContent',
+            'link': 'loc',
+            'date_in_text': 'div.singleDate::text',
+            'category_in_text': 'div.breadcrumbs>span span:nth-child(2)>a::text'
+        }
     }
 }

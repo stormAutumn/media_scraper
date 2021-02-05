@@ -74,7 +74,7 @@ class MediaSpider(scrapy.Spider):
 
             urls_dates = ()
 
-            if config.get('start_request_type') == 'pages_scraper':
+            if config.get('start_request_type') in ['pages_scraper', 'xml_scraper']:
                 if media == 'svoboda':
                     # у свободы только одна дата и єто должна біть конечная дата
                     urls_dates = (
@@ -143,7 +143,7 @@ class MediaSpider(scrapy.Spider):
                 return
 
 
-        if config.get('start_request_type') == 'xml_scraper':
+        elif config.get('start_request_type') == 'xml_scraper':
             all_articles = reduce(lambda seq, key: seq[key], selectors.get('main_container'), \
                                 xmltodict.parse(response.text))
 
@@ -169,7 +169,7 @@ class MediaSpider(scrapy.Spider):
 
         # Зараз цей випадок тільки для Обозревателя
         # але якщо ще будуть такі медіа, то можна змінити їх тип на якийсь json_scraper
-        if media == 'obozrevatel':
+        elif media == 'obozrevatel':
             all_articles = json.loads(response.text)[selectors.get('main_container')]
             if not all_articles:
                 print(f'Parsed all pages for {date_start}: finishing')
