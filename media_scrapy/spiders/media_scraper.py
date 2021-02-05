@@ -344,6 +344,7 @@ class MediaSpider(scrapy.Spider):
                 meta=new_meta,
             )
 
+
     def parse_article_body(self, response):
         media = response.meta['media']
         selectors = media_config[media]['selectors']
@@ -387,8 +388,8 @@ class MediaSpider(scrapy.Spider):
         article_loader.add_value('text', text)
 
 
-# НВ і 24 канал беруть кількість переглядів з іншої сторінки, на яку ми тут переходимо
-# TODO: переписати це, додавши урл у конфіг
+        # НВ і 24 канал беруть кількість переглядів з іншої сторінки, на яку ми тут переходимо
+        # TODO: переписати це, додавши урл у конфіг
         if media == 'nv':
             views_url = response.url.rsplit('-', maxsplit=1)[-1]
             views_url = 'https://nv.ua/get_article_views/' + views_url
