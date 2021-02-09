@@ -619,13 +619,43 @@ media_config = {
         'url_prefix': 'https://golos.ua/news/',
         'url_template': 'https://api.golos.ua/wp-json/wp/v2/posts?_embed=&before={date_end}T00%3A01%3A00&after={date}T00%3A59%3A00&page={page_number}&per_page=100',
         'selectors': {
-            # 'main_container': 'Data',
             'link': ['slug'],
             'title': ['title','rendered'],
             'text': ['content','rendered'],
             'date': ['date'],
             'category': ['_embedded', 'wp:term', 0, 0, 'name'],
             'next_page': 'next_number'
+        }
+    },
+    'kp': {
+        'start_request_type': 'media_scraper',
+        'domain': 'kp.ua',
+        'url_template': 'https://kp.ua/archive/{date}/',
+        'selectors': {
+            'main_container': 'ul.news-online.news-per-day li',
+            'title': 'a::attr(title)',
+            'text': 'div.content',
+            'link': 'a::attr(href)',
+            'time': 'a>span::text',
+            'subtitle_in_text': 'div.content-info::text',
+            'category_in_text': 'div.breadcrumbs>span[typeof="v:Breadcrumb"]>a::text'
+        }
+    },
+    'fakty': {
+        'start_request_type': 'media_scraper',
+        'domain': 'fakty.ua',
+        'url_prefix': 'https://fakty.ua',
+        'url_template': 'https://fakty.ua/archive/{date}',
+        'selectors': {
+            'main_container': 'div.items div.my-flex-block1',
+            'title': 'a.tit>p::text',
+            'text': 'div#article_content3',
+            'link': 'a.tit::attr(href)',
+            'time': 'span.mytime::text',
+            'date': 'span.mydate::text',
+            'views': 'span.stat_text::text',
+            'category_in_text': 'span.fl_l.my_rubrika>a::text',
+            'next_page': 'div.pager>ul li.page.active+li>a::attr(href)'
         }
     }
 }
