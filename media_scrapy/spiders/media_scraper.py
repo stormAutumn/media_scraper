@@ -10,6 +10,7 @@ from datetime import datetime
 import dateparser
 import psycopg2
 import json
+from functools import reduce
 
 from media_config import media_config
 from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
@@ -142,22 +143,27 @@ class MediaSpider(scrapy.Spider):
 
         # Зараз цей випадок тільки для Обозревателя
         # але якщо ще будуть такі медіа, то можна змінити їх тип на якийсь json_scraper
-        if media == 'obozrevatel':
-            all_articles = json.loads(response.text)[selectors.get('main_container')]
-            if not all_articles:
+        elif config.get('response_type') == 'json_scraper':
+            all_articles = json.loads(response.text)
+            if selectors.get('main_container') != None:
+                all_articles = all_articles[selectors.get('main_container')]
+            if not all_articles or (not isinstance(all_articles,list)):
                 print(f'Parsed all pages for {date_start}: finishing')
                 return 
                 
             for article_loader, article_url in self.parse_json_result(all_articles, selectors, config, media, response.meta['urls_to_skip']):
                 if article_url:
-                    yield scrapy.Request(
-                            url=article_url,
-                            callback=self.parse_article_body,
-                            meta={
-                                'media': media,
-                                'article_loader': article_loader
-                            }
-                        )
+                    if article_loader.get_collected_values('text'):
+                        yield article_loader.load_item()
+                    else:    
+                        yield scrapy.Request(
+                                url=article_url,
+                                callback=self.parse_article_body,
+                                meta={
+                                    'media': media,
+                                    'article_loader': article_loader
+                                }
+                            )
 
         else:
         # TODO rename main_container to article_item
@@ -454,12 +460,12 @@ class MediaSpider(scrapy.Spider):
             article_url = None
             for key, selector in selectors.items():
                 if isinstance(selector, list):
-                    value = article
-                    # цикл для вкладених рівнів
-                    for k in selector:
-                        value = value[k]
+                    value = reduce((lambda seq, key: seq[key]), selector, article)
 
-                    if key =='link':
+                    if key == 'link':
+                        if 'http' not in value:
+                            value = config.get('url_prefix') + value
+
                         if value in urls_to_skip:
                             p('ALREADY IN DB')
                             break
@@ -471,6 +477,7 @@ class MediaSpider(scrapy.Spider):
                     article_loader.add_value(key, value)
          
             article_loader.add_value('domain', config.get('domain'))
+
 
             yield article_loader, article_url
         

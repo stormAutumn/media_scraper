@@ -36,6 +36,7 @@ media_config = {
     # формується просто збільшенням page_number на 1
     'obozrevatel': {
         'start_request_type': 'media_scraper',
+        'response_type': 'json_scraper',
         'domain': 'https://www.obozrevatel.com',
         'url_template': 'https://www.obozrevatel.com/api/news/newslist/relatednews/pictureoftheday/?page={page_number}&date={date}&language=ua',
         'selectors': {
@@ -611,6 +612,21 @@ media_config = {
             'category_in_text': 'div.pull-left>ul>li.active>a::text',
             'views_in_text': 'div.article-announcement-view>b::text',
             'next_page': 'a.next.page-numbers::attr(href)'
+        }
+    },
+    'golosua': {
+        'start_request_type': 'pages_scraper',
+        'response_type': 'json_scraper',
+        'domain': 'golos.ua',
+        'url_prefix': 'https://golos.ua/news/',
+        'url_template': 'https://api.golos.ua/wp-json/wp/v2/posts?_embed=&before={date_end}T00%3A01%3A00&after={date}T00%3A59%3A00&page={page_number}&per_page=100',
+        'selectors': {
+            'link': ['slug'],
+            'title': ['title','rendered'],
+            'text': ['content','rendered'],
+            'date': ['date'],
+            'category': ['_embedded', 'wp:term', 0, 0, 'name'],
+            'next_page': 'next_number'
         }
     },
     'kp': {
