@@ -338,7 +338,7 @@ media_config = {
             'subtitle': 'div.b-card--caption > h5::text',
             'link': '::attr(href)',
             'date': 'div.b-card--caption > time::text',
-            # 'category_in_text': 'span.label.label-category::text',
+            'category_in_text': 'ul.b_breadcrumbs li:last-child>a>span::text',
             'next_page': 'ul.pagination > li.page-item > a[rel="next"]::attr(href)'
         }
     },
