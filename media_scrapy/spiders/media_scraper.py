@@ -11,6 +11,7 @@ import dateparser
 import psycopg2
 import json
 from functools import reduce
+import re
 
 from media_config import media_config
 from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
@@ -353,6 +354,7 @@ class MediaSpider(scrapy.Spider):
 
     def parse_article_body(self, response):
         media = response.meta['media']
+        config = media_config[media]
         selectors = media_config[media]['selectors']
         text = response.css(selectors['text']).extract_first()
         
@@ -400,49 +402,33 @@ class MediaSpider(scrapy.Spider):
         article_loader.add_value('text', text)
 
 
-        # НВ і 24 канал беруть кількість переглядів з іншої сторінки, на яку ми тут переходимо
-        # TODO: переписати це, додавши урл у конфіг
-        if media == 'nv':
-            views_url = response.url.rsplit('-', maxsplit=1)[-1]
-            views_url = 'https://nv.ua/get_article_views/' + views_url
+        # якщо є окрема сторінка з кількістю переглядів, переходимо на неї 
+        if config.get('views_url'):
+            article_id_pattern = re.compile(config.get('article_id_pattern'))
+            article_id = article_id_pattern.search(response.url).group(1)
+            views_url = config.get('views_url') + article_id
             new_meta = response.meta.copy()
             yield scrapy.Request(
                 url=views_url,
-                callback=self.get_nv_views,
-                meta=new_meta,
-            )
-        elif media == '24tv':
-            views_url = response.url.rsplit('_', maxsplit=1)[-1].strip('n')
-            views_url = 'https://counter24.luxnet.ua/counter/' + views_url
-            new_meta = response.meta.copy()
-            yield scrapy.Request(
-                url=views_url,
-                callback=self.get_24tv_views,
+                callback=self.parse_views_page,
                 meta=new_meta,
             )
         else:
             yield article_loader.load_item()
 
 
+    def parse_views_page(self, response):
+        views = None
+        media = response.meta['media']
+        if media == 'nv':
+            views = response.css('::text').get()
+        elif media == '24tv':
+            json_views = json.loads(response.text)
+            if json_views and ('value' in json_views.keys()):
+                views = json_views['value']
 
-    def get_nv_views(self, response):
-
-        views = response.css('::text').get()
         article_loader = response.meta['article_loader']
-        
-        if views:
-            article_loader.add_value('views', views)
 
-        yield article_loader.load_item()
-
-
-    def get_24tv_views(self, response):
-
-        views = json.loads(response.text)
-        if views and ('value' in views.keys()):
-            views = views['value']
-        article_loader = response.meta['article_loader']
-        
         if views:
             article_loader.add_value('views', views)
 

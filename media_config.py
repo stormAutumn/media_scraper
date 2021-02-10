@@ -148,6 +148,8 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': '24tv.ua',
         'url_prefix': '',
+        'views_url': 'https://counter24.luxnet.ua/counter/',
+        'article_id_pattern': '_n(\d+)$',
         'url_template': 'https://24tv.ua/archive/{date}/',
         'selectors': {
             'main_container': 'ul.list>li>div.txt',
@@ -516,6 +518,8 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'nv.ua',
         'url_template': 'https://nv.ua/sitemap_{date}.html',
+        'views_url': 'https://nv.ua/get_article_views/',
+        'article_id_pattern': '\-(\d+\.html)$',
         'selectors': {
             'main_container': 'div.row > div.col-xs-12 ~ p',
             'title': 'a::text',
