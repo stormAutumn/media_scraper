@@ -142,7 +142,7 @@ def parse_date(media, date_response_format):
         # якщо номер поточного місяця менший, значить збираємо новини за минулий рік
         if datetime.now().month < date_parsed.month:
             date_parsed = date_parsed.replace(year=date_parsed.year-1)
-    if media == '24tv' or media == 'glavcom' or media == 'suspilne':
+    if media == '24tv' or media == 'suspilne':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y, %H:%M'], languages=['uk'])
     if media == 'gordonua':
@@ -196,7 +196,10 @@ def parse_date(media, date_response_format):
     if media == 'fakty':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y'], languages=['ru'])
-
+    if media == 'glavcom':
+        date_response_format= date_response_format.replace('i', 'і')
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+                '%d %B %Y, %H:%M'], languages=['uk'])
     return date_parsed
 
 
