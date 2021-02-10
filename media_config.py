@@ -598,6 +598,35 @@ media_config = {
             'next_page': 'div.b_center_pager li.arrow:last-child > a::attr(href)'
         }
     },
+    'bykvu': {
+        'start_request_type': 'pages_scraper',
+        'response_type': 'xml_scraper'
+        'domain': 'bykvu.com',
+        'url_template': 'https://bykvu.com/ua/sitemap-posttype-post.{date}.xml',
+        'selectors': {
+            'main_container': ['urlset', 'url'],
+            'title_in_text': 'article.article-item>h1::text',
+            'subtitle_in_text': 'div.lead>p::text',
+            'text': 'div.post-content',
+            'link': 'loc',
+            'date_in_text': 'div.col-6>span.meta::text'
+        }
+    },
+    'vesti': {
+        'start_request_type': 'pages_scraper',
+        'response_type': 'xml_scraper'
+        'domain': 'vesti.ua',
+        'url_template': 'https://vesti.ua/sitemap-pt-post-{date}.xml',
+        'selectors': {
+            'main_container': ['urlset', 'url'],
+            'title_in_text': 'div.singleTitle > h1.singleh1Title::text',
+            'subtitle_in_text': 'div.singlePostSubtitle::text',
+            'text': 'div.singleMainContent',
+            'link': 'loc',
+            'date_in_text': 'div.singleDate::text',
+            'category_in_text': 'div.breadcrumbs>span span:nth-child(2)>a::text'
+        }
+    },
     'telegraf': {
         'start_request_type': 'media_scraper',
         'domain': 'telegraf.com.ua',
