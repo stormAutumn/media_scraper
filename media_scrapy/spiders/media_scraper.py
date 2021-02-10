@@ -385,6 +385,12 @@ class MediaSpider(scrapy.Spider):
                 subtitle = subtitle.strip()
                 article_loader.add_value('subtitle', subtitle)
 
+        if selectors.get('title_in_text') != None:
+            title = response.css(selectors['title_in_text']).get()
+            if title:
+                title = title.strip()
+                article_loader.replace_value('title', title)
+
         article_loader.add_value('text', text)
 
 

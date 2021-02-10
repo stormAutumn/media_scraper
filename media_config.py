@@ -50,14 +50,14 @@ media_config = {
             'next_page': 'next_number'
         }
     },
-
     'rbc': {
         'start_request_type': 'media_scraper',
         'domain': 'https://www.rbc.ua',
         'url_prefix': '',
         'url_template': 'https://www.rbc.ua/ukr/archive/{date}',
         'selectors': {
-            'main_container': 'div.news-feed-item > div.content-section > a',
+            'main_container': 'div.newsline > div > a',
+            'title_in_text': 'article>h1::text',
             'title': '::text',
             'text': 'div.publication-sticky-container,div.txt',
             'link': '::attr(href)',
