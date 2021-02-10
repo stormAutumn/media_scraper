@@ -51,14 +51,14 @@ media_config = {
             'next_page': 'next_number'
         }
     },
-
     'rbc': {
         'start_request_type': 'media_scraper',
         'domain': 'https://www.rbc.ua',
         'url_prefix': '',
         'url_template': 'https://www.rbc.ua/ukr/archive/{date}',
         'selectors': {
-            'main_container': 'div.news-feed-item > div.content-section > a',
+            'main_container': 'div.newsline > div > a',
+            'title_in_text': 'article>h1::text',
             'title': '::text',
             'text': 'div.publication-sticky-container,div.txt',
             'link': '::attr(href)',
@@ -116,8 +116,8 @@ media_config = {
     'zik': {
         'start_request_type': 'media_scraper',
         'domain': 'zik.ua',
-        'url_prefix': 'https://zik.ua',
-        'url_template': 'https://zik.ua/sitemap/2020/{date}?pg={page_number}',
+        'url_prefix': 'https://zikua.tv',
+        'url_template': 'https://zikua.tv/sitemap/{date}?pg={page_number}',
         'selectors': {
             'main_container': 'div.b-archive-news-list > ul.news-list > li.news-list-item',
             'title': 'a::text',
@@ -279,16 +279,18 @@ media_config = {
         #robots_obey = False in settings
         'start_request_type': 'media_scraper',
         'domain': '112.ua',
-        'url_prefix': 'https://ua.112.ua',
-        'url_template': 'https://ua.112.ua/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
+        'url_prefix': 'https://ua.112ua.tv',
+        'url_template': 'https://ua.112ua.tv/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
         'selectors': {
             'main_container': 'div.decs-list',
             'title': 'a::text',
-            'text': 'article.article-content.page-cont',
+            # 'text': 'article.article-content.page-cont',
+            'text': 'div.article-content_text',
             'link': 'a::attr(href)',
             'date': 'div > span::text',
             'time': 'div > span > time::text',
             'category_in_text': 'ul.row.align-middle li.breadcrumbs-link:last-child span::text',
+            'subtitle_in_text': 'p.top-text::text',
             'next_page': 'ul.pagination > li.next> a::attr(href)'
         }
     },
@@ -337,7 +339,7 @@ media_config = {
             'subtitle': 'div.b-card--caption > h5::text',
             'link': '::attr(href)',
             'date': 'div.b-card--caption > time::text',
-            # 'category_in_text': 'span.label.label-category::text',
+            'category_in_text': 'ul.b_breadcrumbs li:last-child>a>span::text',
             'next_page': 'ul.pagination > li.page-item > a[rel="next"]::attr(href)'
         }
     },
