@@ -36,6 +36,7 @@ media_config = {
     # формується просто збільшенням page_number на 1
     'obozrevatel': {
         'start_request_type': 'media_scraper',
+        'response_type': 'json_scraper',
         'domain': 'https://www.obozrevatel.com',
         'url_template': 'https://www.obozrevatel.com/api/news/newslist/relatednews/pictureoftheday/?page={page_number}&date={date}&language=ua',
         'selectors': {
@@ -50,14 +51,14 @@ media_config = {
             'next_page': 'next_number'
         }
     },
-
     'rbc': {
         'start_request_type': 'media_scraper',
         'domain': 'https://www.rbc.ua',
         'url_prefix': '',
         'url_template': 'https://www.rbc.ua/ukr/archive/{date}',
         'selectors': {
-            'main_container': 'div.news-feed-item > div.content-section > a',
+            'main_container': 'div.newsline > div > a',
+            'title_in_text': 'article>h1::text',
             'title': '::text',
             'text': 'div.publication-sticky-container,div.txt',
             'link': '::attr(href)',
@@ -115,8 +116,8 @@ media_config = {
     'zik': {
         'start_request_type': 'media_scraper',
         'domain': 'zik.ua',
-        'url_prefix': 'https://zik.ua',
-        'url_template': 'https://zik.ua/sitemap/2020/{date}?pg={page_number}',
+        'url_prefix': 'https://zikua.tv',
+        'url_template': 'https://zikua.tv/sitemap/{date}?pg={page_number}',
         'selectors': {
             'main_container': 'div.b-archive-news-list > ul.news-list > li.news-list-item',
             'title': 'a::text',
@@ -278,16 +279,18 @@ media_config = {
         #robots_obey = False in settings
         'start_request_type': 'media_scraper',
         'domain': '112.ua',
-        'url_prefix': 'https://ua.112.ua',
-        'url_template': 'https://ua.112.ua/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
+        'url_prefix': 'https://ua.112ua.tv',
+        'url_template': 'https://ua.112ua.tv/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
         'selectors': {
             'main_container': 'div.decs-list',
             'title': 'a::text',
-            'text': 'article.article-content.page-cont',
+            # 'text': 'article.article-content.page-cont',
+            'text': 'div.article-content_text',
             'link': 'a::attr(href)',
             'date': 'div > span::text',
             'time': 'div > span > time::text',
             'category_in_text': 'ul.row.align-middle li.breadcrumbs-link:last-child span::text',
+            'subtitle_in_text': 'p.top-text::text',
             'next_page': 'ul.pagination > li.next> a::attr(href)'
         }
     },
@@ -336,7 +339,7 @@ media_config = {
             'subtitle': 'div.b-card--caption > h5::text',
             'link': '::attr(href)',
             'date': 'div.b-card--caption > time::text',
-            # 'category_in_text': 'span.label.label-category::text',
+            'category_in_text': 'ul.b_breadcrumbs li:last-child>a>span::text',
             'next_page': 'ul.pagination > li.page-item > a[rel="next"]::attr(href)'
         }
     },
@@ -622,6 +625,68 @@ media_config = {
             'link': 'loc',
             'date_in_text': 'div.singleDate::text',
             'category_in_text': 'div.breadcrumbs>span span:nth-child(2)>a::text'
+        }
+    },
+    'telegraf': {
+        'start_request_type': 'media_scraper',
+        'domain': 'telegraf.com.ua',
+        'url_template': 'https://telegraf.com.ua/date/{date}/page/{page_number}/',
+        'selectors': {
+            'main_container': 'div.Nitem div.right',
+            'title': 'a::text',
+            'subtitle': 'p::text',
+            'text': 'div.content-single__block_text_body',
+            'link': 'a::attr(href)',
+            'time': 'div.time::text',
+            'category_in_text': 'div.pull-left>ul>li.active>a::text',
+            'views_in_text': 'div.article-announcement-view>b::text',
+            'next_page': 'a.next.page-numbers::attr(href)'
+        }
+    },
+    'golosua': {
+        'start_request_type': 'pages_scraper',
+        'response_type': 'json_scraper',
+        'domain': 'golos.ua',
+        'url_prefix': 'https://golos.ua/news/',
+        'url_template': 'https://api.golos.ua/wp-json/wp/v2/posts?_embed=&before={date_end}T00%3A01%3A00&after={date}T00%3A59%3A00&page={page_number}&per_page=100',
+        'selectors': {
+            'link': ['slug'],
+            'title': ['title','rendered'],
+            'text': ['content','rendered'],
+            'date': ['date'],
+            'category': ['_embedded', 'wp:term', 0, 0, 'name'],
+            'next_page': 'next_number'
+        }
+    },
+    'kp': {
+        'start_request_type': 'media_scraper',
+        'domain': 'kp.ua',
+        'url_template': 'https://kp.ua/archive/{date}/',
+        'selectors': {
+            'main_container': 'ul.news-online.news-per-day li',
+            'title': 'a::attr(title)',
+            'text': 'div.content',
+            'link': 'a::attr(href)',
+            'time': 'a>span::text',
+            'subtitle_in_text': 'div.content-info::text',
+            'category_in_text': 'div.breadcrumbs>span[typeof="v:Breadcrumb"]>a::text'
+        }
+    },
+    'fakty': {
+        'start_request_type': 'media_scraper',
+        'domain': 'fakty.ua',
+        'url_prefix': 'https://fakty.ua',
+        'url_template': 'https://fakty.ua/archive/{date}',
+        'selectors': {
+            'main_container': 'div.items div.my-flex-block1',
+            'title': 'a.tit>p::text',
+            'text': 'div#article_content3',
+            'link': 'a.tit::attr(href)',
+            'time': 'span.mytime::text',
+            'date': 'span.mydate::text',
+            'views': 'span.stat_text::text',
+            'category_in_text': 'span.fl_l.my_rubrika>a::text',
+            'next_page': 'div.pager>ul li.page.active+li>a::attr(href)'
         }
     }
 }

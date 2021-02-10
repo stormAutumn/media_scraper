@@ -29,17 +29,22 @@ def get_date(date, media):
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return day + '-' + month + '-' + year
-    if media == 'rbc' or media == 'tsn' or media == 'unn' or media == 'vgolos':
+    if media in ['rbc', 'tsn', 'unn', 'vgolos', 'telegraf']:
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return year + '/' + month + '/' + day
-    if media in ['112', 'liga', 'zik', 'dzerkalo_tyzhnya', 'apostrophe', 'nv', 'censor', 'gazetaua']:
+    if media in ['112', 'liga', 'dzerkalo_tyzhnya', 'apostrophe', 'nv', 'censor', 'gazetaua', 'golosua']:
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
         return year + '-' + month + '-' + day
-    if media == 'unian':
+    if media == 'zik':
+        day = date.strftime("%d")
+        month = date.strftime("%m")
+        year = date.strftime("%Y")
+        return year + '/' + year + '-' + month + '-' + day
+    if media == 'unian' or media == 'fakty':
         day = date.strftime("%d")
         month = date.strftime("%m")
         year = date.strftime("%Y")
@@ -90,6 +95,12 @@ def get_date(date, media):
         year = date.strftime("%Y")
         month = date.strftime("%m")
         return year + '-' + month
+    if media == 'kp':
+        year = date.strftime("%Y")
+        month = date.strftime("%B").lower()
+        day = date.strftime(no_zero_format + "d")
+        return year + '/' + month + '/' + day
+
 
 
 def get_media_url(media, date=None, date_end=None, page_number=None):
@@ -145,7 +156,7 @@ def parse_date(media, date_response_format):
         # якщо номер поточного місяця менший, значить збираємо новини за минулий рік
         if datetime.now().month < date_parsed.month:
             date_parsed = date_parsed.replace(year=date_parsed.year-1)
-    if media == '24tv' or media == 'glavcom' or media == 'suspilne':
+    if media == '24tv' or media == 'suspilne':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B %Y, %H:%M'], languages=['uk'])
     if media == 'gordonua':
@@ -176,7 +187,7 @@ def parse_date(media, date_response_format):
     if media == 'hromadske_radio':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y'], languages=['uk'])
-    if media in ['censor', 'tsn', 'obozrevatel', 'ukrinform', 'focus']: 
+    if media in ['censor', 'tsn', 'obozrevatel', 'ukrinform', 'focus', 'golosua']: 
         date_parsed = dateparser.parse(date_response_format)
     if media == 'liga':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
@@ -196,7 +207,13 @@ def parse_date(media, date_response_format):
     if media == 'zaxid':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B'], languages=['uk'])
-
+    if media == 'fakty':
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+            '%d %B %Y'], languages=['ru'])
+    if media == 'glavcom':
+        date_response_format= date_response_format.replace('i', 'і')
+        date_parsed = dateparser.parse(date_response_format, date_formats=[
+                '%d %B %Y, %H:%M'], languages=['uk'])
     return date_parsed
 
 
@@ -244,6 +261,8 @@ def get_clean_views(media, dirty_views_list):
         return dirty_views_list[0].split()[-1]
     if media == 'epravda':
         return dirty_views_list[0].split()[0]
+    if media == 'telegraf':
+        return dirty_views_list[0].replace(',', '')
 
     return get_clean_text(dirty_views_list)
 
