@@ -278,16 +278,18 @@ media_config = {
         #robots_obey = False in settings
         'start_request_type': 'media_scraper',
         'domain': '112.ua',
-        'url_prefix': 'https://ua.112.ua',
-        'url_template': 'https://ua.112.ua/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
+        'url_prefix': 'https://ua.112ua.tv',
+        'url_template': 'https://ua.112ua.tv/archive?date_from={date}&date_to={date}&guest_and_news=&category=&type=',
         'selectors': {
             'main_container': 'div.decs-list',
             'title': 'a::text',
-            'text': 'article.article-content.page-cont',
+            # 'text': 'article.article-content.page-cont',
+            'text': 'div.article-content_text',
             'link': 'a::attr(href)',
             'date': 'div > span::text',
             'time': 'div > span > time::text',
             'category_in_text': 'ul.row.align-middle li.breadcrumbs-link:last-child span::text',
+            'subtitle_in_text': 'p.top-text::text',
             'next_page': 'ul.pagination > li.next> a::attr(href)'
         }
     },
