@@ -115,8 +115,8 @@ media_config = {
     'zik': {
         'start_request_type': 'media_scraper',
         'domain': 'zik.ua',
-        'url_prefix': 'https://zik.ua',
-        'url_template': 'https://zik.ua/sitemap/2020/{date}?pg={page_number}',
+        'url_prefix': 'https://zikua.tv',
+        'url_template': 'https://zikua.tv/sitemap/{date}?pg={page_number}',
         'selectors': {
             'main_container': 'div.b-archive-news-list > ul.news-list > li.news-list-item',
             'title': 'a::text',
