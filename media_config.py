@@ -596,7 +596,8 @@ media_config = {
         }
     },
     'bykvu': {
-        'start_request_type': 'xml_scraper',
+        'start_request_type': 'pages_scraper',
+        'response_type': 'xml_scraper'
         'domain': 'bykvu.com',
         'url_template': 'https://bykvu.com/ua/sitemap-posttype-post.{date}.xml',
         'selectors': {
@@ -609,7 +610,8 @@ media_config = {
         }
     },
     'vesti': {
-        'start_request_type': 'xml_scraper',
+        'start_request_type': 'pages_scraper',
+        'response_type': 'xml_scraper'
         'domain': 'vesti.ua',
         'url_template': 'https://vesti.ua/sitemap-pt-post-{date}.xml',
         'selectors': {
