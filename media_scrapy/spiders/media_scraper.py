@@ -154,7 +154,9 @@ class MediaSpider(scrapy.Spider):
                             callback=self.parse_article_body,
                             meta={
                                 'media': media,
-                                'article_loader': article_loader
+                                'article_loader': article_loader,
+                                'date_start': date_start,
+                                'date_end': date_end
                             }
                         )
 
@@ -176,7 +178,9 @@ class MediaSpider(scrapy.Spider):
                                 callback=self.parse_article_body,
                                 meta={
                                     'media': media,
-                                    'article_loader': article_loader
+                                    'article_loader': article_loader,
+                                    'date_start': date_start,
+                                    'date_end': date_end
                                 }
                             )
 
@@ -313,7 +317,9 @@ class MediaSpider(scrapy.Spider):
                         callback=self.parse_article_body,
                         meta={
                             'media': media,
-                            'article_loader': article_loader
+                            'article_loader': article_loader,
+                            'date_start': date_start,
+                            'date_end': date_end
                         }
                     )
 
@@ -377,6 +383,8 @@ class MediaSpider(scrapy.Spider):
         media = response.meta['media']
         config = media_config[media]
         selectors = media_config[media]['selectors']
+        date_start = response.meta['date_start']
+        date_end = response.meta['date_end']
         text = response.css(selectors['text']).extract_first()
         
         # text може бути None, коли у стрічці новин посилання на підсайти з іншою версткою (типу лайфстайл, спорт, і т.д.)
@@ -393,6 +401,9 @@ class MediaSpider(scrapy.Spider):
             date_from_text = response.css(selectors['date_in_text']).get()
             if date_from_text:
                 date_from_text = parse_date_from_article_page(media, date_from_text)
+                if date_from_text.date() < date_start.date() or date_from_text.date() > date_end.date():
+                    p(f"Article date {date_from_text.date()} is NOT in range [{date_start.date()}, {date_end.date()}]")
+                    return
                 article_loader.replace_value('date', date_from_text)
 
         if selectors.get('category_in_text') != None:
