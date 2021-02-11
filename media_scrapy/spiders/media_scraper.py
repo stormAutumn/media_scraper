@@ -338,6 +338,7 @@ class MediaSpider(scrapy.Spider):
 
             new_meta['page_number'] = next_page_number
             new_meta['current_date'] = current_date
+            new_meta['date_end'] = date_end
 
             yield scrapy.Request(
                 url=next_page_url,
