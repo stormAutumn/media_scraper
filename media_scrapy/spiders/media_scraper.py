@@ -144,7 +144,7 @@ class MediaSpider(scrapy.Spider):
                 return
 
 
-        elif config.get('response_type') == 'xml_scraper':
+        if config.get('response_type') == 'xml_scraper':
             all_articles = reduce(lambda seq, key: seq[key], selectors.get('main_container'), \
                                 xmltodict.parse(response.text))
 

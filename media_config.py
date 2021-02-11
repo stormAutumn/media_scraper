@@ -529,7 +529,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'gazeta.ua',
         'url_prefix': 'https://gazeta.ua',
-        'url_template': 'https://api.gazeta.ua/api/section/stream?page={page_number}&date={date}&category=&specs=stream&lang=uk&template=slim&limit=20',
+        'url_template': 'https://api.gazeta.ua/api/section/stream?page={page_number}&date={date}&category=&specs=stream&lang=uk&template=slim&limit=100',
         'selectors': {
             'main_container': 'div.news-wrapper div.content.ml160',
             'title': 'a.news-title.block.black.fs16.mb5::text',
@@ -600,7 +600,7 @@ media_config = {
     },
     'bykvu': {
         'start_request_type': 'pages_scraper',
-        'response_type': 'xml_scraper'
+        'response_type': 'xml_scraper',
         'domain': 'bykvu.com',
         'url_template': 'https://bykvu.com/ua/sitemap-posttype-post.{date}.xml',
         'selectors': {
@@ -614,7 +614,7 @@ media_config = {
     },
     'vesti': {
         'start_request_type': 'pages_scraper',
-        'response_type': 'xml_scraper'
+        'response_type': 'xml_scraper',
         'domain': 'vesti.ua',
         'url_template': 'https://vesti.ua/sitemap-pt-post-{date}.xml',
         'selectors': {
