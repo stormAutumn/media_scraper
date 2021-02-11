@@ -10,8 +10,10 @@ from datetime import datetime
 import dateparser
 import psycopg2
 import json
+import xmltodict
 from functools import reduce
 import re
+
 
 from media_config import media_config
 from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
@@ -132,7 +134,31 @@ class MediaSpider(scrapy.Spider):
                 print('Processed all pages: finishing')
                 return
 
-        if config.get('response_type') == 'json_scraper':
+        if config.get('response_type') == 'xml_scraper':
+            all_articles = reduce(lambda seq, key: seq[key], selectors.get('main_container'), \
+                                xmltodict.parse(response.text))
+
+            for article in all_articles:
+                article_url = article[selectors.get('link')]
+
+                article_loader = ItemLoader(
+                        item=MediaScraperItem(),
+                        selector=article
+                    )
+
+                article_loader.add_value('link', article_url)
+                article_loader.add_value('domain', config.get('domain'))
+
+                yield scrapy.Request(
+                            url=article_url,
+                            callback=self.parse_article_body,
+                            meta={
+                                'media': media,
+                                'article_loader': article_loader
+                            }
+                        )
+
+        elif config.get('response_type') == 'json_scraper':
             all_articles = json.loads(response.text)
             if selectors.get('main_container') != None:
                 all_articles = all_articles[selectors.get('main_container')]
