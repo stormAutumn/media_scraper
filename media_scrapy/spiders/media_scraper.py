@@ -59,10 +59,11 @@ class MediaSpider(scrapy.Spider):
         urls_to_skip = self.get_previously_fetched_urls()
 
         media = self.media
+        date_start = self.date_start
+        date_end = self.date_end
+
         config = media_config[media]
 
-        date_start = datetime.fromisoformat(self.date_start)
-        date_end = datetime.fromisoformat(self.date_end)
         print(date_start, date_end)
         
         page_number = 1
@@ -141,8 +142,6 @@ class MediaSpider(scrapy.Spider):
                 print('Processed all pages: finishing')
                 return
 
-        # Зараз цей випадок тільки для Обозревателя
-        # але якщо ще будуть такі медіа, то можна змінити їх тип на якийсь json_scraper
         elif config.get('response_type') == 'json_scraper':
             all_articles = json.loads(response.text)
             if selectors.get('main_container') != None:
@@ -378,7 +377,6 @@ class MediaSpider(scrapy.Spider):
             if category:
                 category = get_categories_string(category)
                 article_loader.add_value('category', category)
-
 
         if selectors.get('views_in_text') != None:
             views = response.css(selectors['views_in_text']).extract()
