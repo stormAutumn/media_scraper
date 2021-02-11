@@ -1,5 +1,8 @@
-import os 
-import sys
+# Run script with command:
+# python runner.py <date_start> <date_end> --media media_name
+# date_start and date_end must be in YYYY-MM-DD format
+# --media argument is optional (if not defined spider will crawl all sites from media_config)
+
 from datetime import datetime
 import argparse
 from media_config import media_config
