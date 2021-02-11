@@ -263,6 +263,7 @@ media_config = {
         'start_request_type': 'pages_scraper',
         'domain': 'www.radiosvoboda.org',
         'url_prefix': 'https://www.radiosvoboda.org',
+        'start_page_number': 0,
         'url_template': 'https://www.radiosvoboda.org/z/630/{date_end}?p={page_number}',
         'selectors': {
             'main_container': '.content-offset .row>ul>li',
@@ -503,6 +504,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'vgolos.com.ua',
         'url_prefix': 'https://vgolos.com.ua',
+        'start_page_number': 0,
         'url_template': 'https://vgolos.com.ua/archive/{date}?offset={page_number}',
         'selectors': {
             'main_container': 'article',

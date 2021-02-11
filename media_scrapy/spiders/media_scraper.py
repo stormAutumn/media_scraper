@@ -68,29 +68,19 @@ class MediaSpider(scrapy.Spider):
         
         page_number = 1
 
-        # для vgolos будемо передавати не номер сторінки, а offset, тож треба починати з 0:
-        if media == 'vgolos':
-            page_number = 0
+        if config.get('start_page_number') != None:
+            page_number = config.get('start_page_number')
 
         urls_dates = ()
 
         if config.get('start_request_type') == 'pages_scraper':
-            if media == 'svoboda':
-                # у свободы только одна дата и єто должна біть конечная дата
-                urls_dates = (
-                    [get_media_url(media,
-                                   date_end=date_end,
-                                   page_number=page_number)],
-                    [date_start]
-                )
-            else:
-                urls_dates = (
-                    [get_media_url(media,
-                                   date=date_start,
-                                   date_end=date_end,
-                                   page_number=page_number)],
-                    [date_start]
-                )
+            urls_dates = (
+                [get_media_url(media,
+                               date=date_start,
+                               date_end=date_end,
+                               page_number=page_number)],
+                [date_start]
+            )
 
         else:
             urls_dates = get_media_urls_for_period(
@@ -142,7 +132,7 @@ class MediaSpider(scrapy.Spider):
                 print('Processed all pages: finishing')
                 return
 
-        elif config.get('response_type') == 'json_scraper':
+        if config.get('response_type') == 'json_scraper':
             all_articles = json.loads(response.text)
             if selectors.get('main_container') != None:
                 all_articles = all_articles[selectors.get('main_container')]
@@ -209,6 +199,8 @@ class MediaSpider(scrapy.Spider):
                 if not article_date:
                     print('article_date is None: skipping the item')
                     continue
+
+                current_date = article_date
 
                 if article_date.date() > date_end.date():
                     print(
@@ -312,6 +304,10 @@ class MediaSpider(scrapy.Spider):
                 if media == 'vgolos':
                     next_page_number = current_page_number+15
         
+                if (media == 'svoboda') and current_page_number==100:
+                    date_end = current_date
+                    next_page_number = 0
+
                 next_page_url = get_media_url(
                     media,
                     date=date_start,

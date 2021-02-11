@@ -27,7 +27,8 @@ if __name__ == '__main__':
 	if args.media:
 		if args.media in media_config.keys():
 			print('Scrapping', args.media)
-			runner.crawl('media_scraper', media=args.media, date_start=args.date_start, date_end=args.date_end)
+			d = runner.crawl('media_scraper', media=args.media, date_start=args.date_start, date_end=args.date_end)
+			d.addBoth(lambda _: reactor.stop())
 			reactor.run()
 		else:
 			print(f'Media name "{args.media}" not in the list')
