@@ -192,6 +192,8 @@ def parse_date(media, date_response_format):
     if media == 'liga':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d.%m.%Y %H:%M'], languages=['uk'])
+        if not date_parsed:
+            date_parsed = dateparser.parse(date_response_format)
     if media == 'espreso':
         date_parsed = dateparser.parse(date_response_format, date_formats=[
             '%d %B, %Y'], languages=['uk'])
