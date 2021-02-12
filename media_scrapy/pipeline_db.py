@@ -6,11 +6,12 @@ from media_config import media_config
 
 class DatabasePipeline(object):
 
-    def __init__(self, db, user, passwd, host):
+    def __init__(self, db, user, passwd, host, table):
         self.db = db
         self.user = user
         self.passwd = passwd
         self.host = host
+        self.table = table
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -21,7 +22,8 @@ class DatabasePipeline(object):
         user = db_settings['user']
         passwd = db_settings['passwd']
         host = db_settings['host']
-        return cls(db, user, passwd, host)
+        table = db_settings['table']
+        return cls(db, user, passwd, host, table)
 
     def open_spider(self, spider):
         self.conn = psycopg2.connect(dbname=self.db,
@@ -31,7 +33,7 @@ class DatabasePipeline(object):
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):
-        sql = ''.join(['INSERT INTO news_items ',
+        sql = ''.join(['INSERT INTO {} '.format(self.table),
                        '(title, domain, link, datetime, subtitle, text, views, category) ',
                        'VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)'])
 

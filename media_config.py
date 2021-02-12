@@ -148,6 +148,8 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': '24tv.ua',
         'url_prefix': '',
+        'views_url': 'https://counter24.luxnet.ua/counter/',
+        'article_id_pattern': '_n(\d+)$',
         'url_template': 'https://24tv.ua/archive/{date}/',
         'selectors': {
             'main_container': 'ul.list>li>div.txt',
@@ -261,6 +263,7 @@ media_config = {
         'start_request_type': 'pages_scraper',
         'domain': 'www.radiosvoboda.org',
         'url_prefix': 'https://www.radiosvoboda.org',
+        'start_page_number': 0,
         'url_template': 'https://www.radiosvoboda.org/z/630/{date_end}?p={page_number}',
         'selectors': {
             'main_container': '.content-offset .row>ul>li',
@@ -391,21 +394,21 @@ media_config = {
             'next_page_number': 'only_page_number'
         }
     },
-    'hromadske_radio': {
-        'start_request_type': 'pages_scraper',
-        'domain': 'https://hromadske.radio',
-        'url_prefix': 'https://hromadske.radio',
-        'url_template': 'https://hromadske.radio/news/page/{page_number}',
-        'selectors': {
-            'main_container': 'article > div.wrap2 > div.content',
-            'title': 'a > div.caption::text',
-            'link': 'a:nth-child(2)::attr(href)',
-            'text': 'div.inner-content',
-            'date': 'div.date > time:nth-child(1)::text',
-            'time': 'div.date > time:nth-child(2)::text',
-            'next_page': 'ul.pages > li.link.center.active + li > a::attr(href)'
-        }
-    },
+    # 'hromadske_radio': {
+    #     'start_request_type': 'pages_scraper',
+    #     'domain': 'https://hromadske.radio',
+    #     'url_prefix': 'https://hromadske.radio',
+    #     'url_template': 'https://hromadske.radio/news/page/{page_number}',
+    #     'selectors': {
+    #         'main_container': 'article > div.wrap2 > div.content',
+    #         'title': 'a > div.caption::text',
+    #         'link': 'a:nth-child(2)::attr(href)',
+    #         'text': 'div.inner-content',
+    #         'date': 'div.date > time:nth-child(1)::text',
+    #         'time': 'div.date > time:nth-child(2)::text',
+    #         'next_page': 'ul.pages > li.link.center.active + li > a::attr(href)'
+    #     }
+    # },
     # sraped correctly only when in 10-days intervals
     'hromadske': {
         'start_request_type': 'pages_scraper',
@@ -501,6 +504,7 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'vgolos.com.ua',
         'url_prefix': 'https://vgolos.com.ua',
+        'start_page_number': 0,
         'url_template': 'https://vgolos.com.ua/archive/{date}?offset={page_number}',
         'selectors': {
             'main_container': 'article',
@@ -516,6 +520,8 @@ media_config = {
         'start_request_type': 'media_scraper',
         'domain': 'nv.ua',
         'url_template': 'https://nv.ua/sitemap_{date}.html',
+        'views_url': 'https://nv.ua/get_article_views/',
+        'article_id_pattern': '\-(\d+\.html)$',
         'selectors': {
             'main_container': 'div.row > div.col-xs-12 ~ p',
             'title': 'a::text',
@@ -648,7 +654,7 @@ media_config = {
         'response_type': 'json_scraper',
         'domain': 'golos.ua',
         'url_prefix': 'https://golos.ua/news/',
-        'url_template': 'https://api.golos.ua/wp-json/wp/v2/posts?_embed=&before={date_end}T00%3A01%3A00&after={date}T00%3A59%3A00&page={page_number}&per_page=100',
+        'url_template': 'https://api.golos.ua/wp-json/wp/v2/posts?_embed=&before={date_end}T24%3A01%3A00&after={date}T00%3A59%3A00&page={page_number}&per_page=100',
         'selectors': {
             'link': ['slug'],
             'title': ['title','rendered'],

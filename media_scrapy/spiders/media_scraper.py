@@ -12,6 +12,7 @@ import psycopg2
 import json
 import xmltodict
 from functools import reduce
+import re
 
 
 from media_config import media_config
@@ -44,8 +45,9 @@ class MediaSpider(scrapy.Spider):
                                 password=db_settings['passwd'],
                                 host=db_settings['host'])
         cursor = conn.cursor()
+        table = db_settings['table']
         # не має залежити від списку ЗМІ що обробляється через перехресні посилання як у УП та ЄП
-        sql_query = 'SELECT link FROM news_items'
+        sql_query = 'SELECT link FROM {}'.format(table)
         cursor.execute(sql_query)
         fetched_records = cursor.fetchall()
         records = []
@@ -58,66 +60,55 @@ class MediaSpider(scrapy.Spider):
     def start_requests(self):
         urls_to_skip = self.get_previously_fetched_urls()
 
-        for media in media_config.keys():
-            config = media_config[media]
+        media = self.media
+        date_start = self.date_start
+        date_end = self.date_end
 
-            if media != '112':
-                continue
+        config = media_config[media]
 
-            date_start = datetime(2020, 12, 1)
-            date_end = datetime(2020, 12, 31)
+        print(date_start, date_end)
+        
+        page_number = 1
 
-            page_number = 1
+        if config.get('start_page_number') != None:
+            page_number = config.get('start_page_number')
 
-            # для vgolos будемо передавати не номер сторінки, а offset, тож треба починати з 0:
-            if media == 'vgolos':
-                page_number = 0
+        urls_dates = ()
 
-            urls_dates = ()
+        if config.get('start_request_type') == 'pages_scraper':
+            urls_dates = (
+                [get_media_url(media,
+                               date=date_start,
+                               date_end=date_end,
+                               page_number=page_number)],
+                [date_start]
+            )
 
-            if config.get('start_request_type') == 'pages_scraper':
-                if media == 'svoboda':
-                    # у свободы только одна дата и єто должна біть конечная дата
-                    urls_dates = (
-                        [get_media_url(media,
-                                       date_end=date_end,
-                                       page_number=page_number)],
-                        [date_start]
-                    )
-                else:
-                    urls_dates = (
-                        [get_media_url(media,
-                                       date=date_start,
-                                       date_end=date_end,
-                                       page_number=page_number)],
-                        [date_start]
-                    )
+        else:
+            urls_dates = get_media_urls_for_period(
+                media,
+                date_start=date_start,
+                date_end=date_end,
+                page_number=page_number
+            )
 
-            else:
-                urls_dates = get_media_urls_for_period(
-                    media,
-                    date_start=date_start,
-                    date_end=date_end,
-                    page_number=page_number
-                )
+        p(urls_dates)
 
-            p(urls_dates)
-
-            for url, date in zip(*urls_dates):
-                yield scrapy.Request(
-                    url=url,
-                    callback=self.parse_article_headers,
-                    meta={
-                        'media': media,
-                        'date': date,
-                        'date_end': date_end,
-                        'page_number': page_number,
-                        'urls_to_skip': urls_to_skip,
-                        # для медія в яких у артиклів немає дати, а є тільки дата на сторінки, і то тільки на межі днів
-                        # наприклад https://hromadske.ua/news
-                        'current_date': datetime.now(),
-                    }
-                )
+        for url, date in zip(*urls_dates):
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse_article_headers,
+                meta={
+                    'media': media,
+                    'date': date,
+                    'date_end': date_end,
+                    'page_number': page_number,
+                    'urls_to_skip': urls_to_skip,
+                    # для медія в яких у артиклів немає дати, а є тільки дата на сторінки, і то тільки на межі днів
+                    # наприклад https://hromadske.ua/news
+                    'current_date': datetime.now(),
+                }
+            )
 
 
     def parse_article_headers(self, response):
@@ -143,7 +134,6 @@ class MediaSpider(scrapy.Spider):
                 print('Processed all pages: finishing')
                 return
 
-
         if config.get('response_type') == 'xml_scraper':
             all_articles = reduce(lambda seq, key: seq[key], selectors.get('main_container'), \
                                 xmltodict.parse(response.text))
@@ -164,12 +154,12 @@ class MediaSpider(scrapy.Spider):
                             callback=self.parse_article_body,
                             meta={
                                 'media': media,
-                                'article_loader': article_loader
+                                'article_loader': article_loader,
+                                'date_start': date_start,
+                                'date_end': date_end
                             }
                         )
 
-        # Зараз цей випадок тільки для Обозревателя
-        # але якщо ще будуть такі медіа, то можна змінити їх тип на якийсь json_scraper
         elif config.get('response_type') == 'json_scraper':
             all_articles = json.loads(response.text)
             if selectors.get('main_container') != None:
@@ -188,7 +178,9 @@ class MediaSpider(scrapy.Spider):
                                 callback=self.parse_article_body,
                                 meta={
                                     'media': media,
-                                    'article_loader': article_loader
+                                    'article_loader': article_loader,
+                                    'date_start': date_start,
+                                    'date_end': date_end
                                 }
                             )
 
@@ -237,6 +229,8 @@ class MediaSpider(scrapy.Spider):
                 if not article_date:
                     print('article_date is None: skipping the item')
                     continue
+
+                current_date = article_date
 
                 if article_date.date() > date_end.date():
                     print(
@@ -323,7 +317,9 @@ class MediaSpider(scrapy.Spider):
                         callback=self.parse_article_body,
                         meta={
                             'media': media,
-                            'article_loader': article_loader
+                            'article_loader': article_loader,
+                            'date_start': date_start,
+                            'date_end': date_end
                         }
                     )
 
@@ -340,6 +336,10 @@ class MediaSpider(scrapy.Spider):
                 if media == 'vgolos':
                     next_page_number = current_page_number+15
         
+                if (media == 'svoboda') and current_page_number==100:
+                    date_end = current_date
+                    next_page_number = 0
+
                 next_page_url = get_media_url(
                     media,
                     date=date_start,
@@ -370,6 +370,7 @@ class MediaSpider(scrapy.Spider):
 
             new_meta['page_number'] = next_page_number
             new_meta['current_date'] = current_date
+            new_meta['date_end'] = date_end
 
             yield scrapy.Request(
                 url=next_page_url,
@@ -380,7 +381,10 @@ class MediaSpider(scrapy.Spider):
 
     def parse_article_body(self, response):
         media = response.meta['media']
+        config = media_config[media]
         selectors = media_config[media]['selectors']
+        date_start = response.meta['date_start']
+        date_end = response.meta['date_end']
         text = response.css(selectors['text']).extract_first()
         
         # text може бути None, коли у стрічці новин посилання на підсайти з іншою версткою (типу лайфстайл, спорт, і т.д.)
@@ -397,6 +401,9 @@ class MediaSpider(scrapy.Spider):
             date_from_text = response.css(selectors['date_in_text']).get()
             if date_from_text:
                 date_from_text = parse_date_from_article_page(media, date_from_text)
+                if date_from_text.date() < date_start.date() or date_from_text.date() > date_end.date():
+                    p(f"Article date {date_from_text.date()} is NOT in range [{date_start.date()}, {date_end.date()}]")
+                    return
                 article_loader.replace_value('date', date_from_text)
 
         if selectors.get('category_in_text') != None:
@@ -404,7 +411,6 @@ class MediaSpider(scrapy.Spider):
             if category:
                 category = get_categories_string(category)
                 article_loader.add_value('category', category)
-
 
         if selectors.get('views_in_text') != None:
             views = response.css(selectors['views_in_text']).extract()
@@ -427,49 +433,33 @@ class MediaSpider(scrapy.Spider):
         article_loader.add_value('text', text)
 
 
-        # НВ і 24 канал беруть кількість переглядів з іншої сторінки, на яку ми тут переходимо
-        # TODO: переписати це, додавши урл у конфіг
-        if media == 'nv':
-            views_url = response.url.rsplit('-', maxsplit=1)[-1]
-            views_url = 'https://nv.ua/get_article_views/' + views_url
+        # якщо є окрема сторінка з кількістю переглядів, переходимо на неї 
+        if config.get('views_url'):
+            article_id_pattern = re.compile(config.get('article_id_pattern'))
+            article_id = article_id_pattern.search(response.url).group(1)
+            views_url = config.get('views_url') + article_id
             new_meta = response.meta.copy()
             yield scrapy.Request(
                 url=views_url,
-                callback=self.get_nv_views,
-                meta=new_meta,
-            )
-        elif media == '24tv':
-            views_url = response.url.rsplit('_', maxsplit=1)[-1].strip('n')
-            views_url = 'https://counter24.luxnet.ua/counter/' + views_url
-            new_meta = response.meta.copy()
-            yield scrapy.Request(
-                url=views_url,
-                callback=self.get_24tv_views,
+                callback=self.parse_views_page,
                 meta=new_meta,
             )
         else:
             yield article_loader.load_item()
 
 
+    def parse_views_page(self, response):
+        views = None
+        media = response.meta['media']
+        if media == 'nv':
+            views = response.css('::text').get()
+        elif media == '24tv':
+            json_views = json.loads(response.text)
+            if json_views and ('value' in json_views.keys()):
+                views = json_views['value']
 
-    def get_nv_views(self, response):
-
-        views = response.css('::text').get()
         article_loader = response.meta['article_loader']
-        
-        if views:
-            article_loader.add_value('views', views)
 
-        yield article_loader.load_item()
-
-
-    def get_24tv_views(self, response):
-
-        views = json.loads(response.text)
-        if views and ('value' in views.keys()):
-            views = views['value']
-        article_loader = response.meta['article_loader']
-        
         if views:
             article_loader.add_value('views', views)
 
