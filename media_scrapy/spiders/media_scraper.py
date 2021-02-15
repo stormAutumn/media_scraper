@@ -521,3 +521,4 @@ class MediaSpider(scrapy.Spider):
             article_loader.add_value('views', views)
 
         yield article_loader.load_item()
+        
