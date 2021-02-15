@@ -23,6 +23,11 @@ from utils import get_media_urls_for_period, get_media_url, get_clean_text,\
 from scrapy.utils.project import get_project_settings
 
 
+class OldDateError(Exception):
+    """Class for exceptions when date is less then start date."""
+    pass
+
+
 def p(message, title=''):
     print(f'================{title}==================')
     print(message)
@@ -118,27 +123,30 @@ class MediaSpider(scrapy.Spider):
         date_start = response.meta['date']
         date_end = response.meta['date_end']
         current_date = response.meta['current_date']
-
-        for article in self.process_articles(response, config):
-            article_url = article[0]
-            article_loader = article[1]
-            if len(article) == 3:
-                current_date = article[2]
-            if article_url:
-                if article_loader.get_collected_values('text'):
-                    yield article_loader.load_item()
-                else:    
-                    yield scrapy.Request(
-                            url=article_url,
-                            callback=self.parse_article_body,
-                            meta={
-                                'media': media,
-                                'config': config,
-                                'article_loader': article_loader,
-                                'date_start': date_start,
-                                'date_end': date_end
-                            }
-                        )
+        try:
+            for article in self.process_articles(response, config):
+                article_url = article[0]
+                article_loader = article[1]
+                if len(article) == 3:
+                    current_date = article[2]
+                if article_url:
+                    if article_loader.get_collected_values('text'):
+                        yield article_loader.load_item()
+                    else:    
+                        yield scrapy.Request(
+                                url=article_url,
+                                callback=self.parse_article_body,
+                                meta={
+                                    'media': media,
+                                    'config': config,
+                                    'article_loader': article_loader,
+                                    'date_start': date_start,
+                                    'date_end': date_end
+                                }
+                            )
+        except OldDateError as error:
+            print(error)
+            return
 
         # після перебору всіх артиклів перевіряємо чи потрібно йти на наступну сторінку
         # TODO схоже принаймні для еспресо (знайти виключення!!) можна просто брати href з кнопки
@@ -244,7 +252,17 @@ class MediaSpider(scrapy.Spider):
                 date_header = date_headers[0]
                 article_date = parse_date(media, date_header)
                 current_date = article_date
-        
+
+        # перевіряємо дату останньої статті на сторінці
+        # якщо вона надто свіжа - переходимо на наступну сторінку
+        if (config.get('start_request_type') == 'pages_scraper') and (selectors.get('date') != None):
+            last_date = all_articles[-1].css(selectors['date']).extract()
+            last_date = parse_date(media, get_clean_text(last_date))
+            p(last_date)
+            if last_date.date() > date_end.date():
+                print('All news on page are too new: GO TO NEXT PAGE')
+                all_articles = []
+
         for article in all_articles:
             # count += 1
             # if count > 2:
@@ -274,9 +292,10 @@ class MediaSpider(scrapy.Spider):
                 continue
 
             if article_date.date() < date_start.date():
-                print(
-                    f'article_date {article_date.date()} is LESS than date_start {date_start.date()}: finishing')
-                return
+                # print(
+                #     f'article_date {article_date.date()} is LESS than date_start {date_start.date()}: finishing')
+                raise OldDateError(f'article_date {article_date.date()} is LESS than date_start {date_start.date()}: finishing')
+                # (Exception(f'article_date {article_date.date()} is LESS than date_start {date_start.date()}: finishing'))
 
             # ---------- COLLECT ALL ITEMS --------------
             if date_start.date() <= article_date.date() <= date_end.date():
